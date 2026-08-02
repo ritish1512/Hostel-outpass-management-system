@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -10,4 +5,101 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+enum Role{
+  STUDENT
+  PARENT
+  MENTOR
+  HOD
+  WARDEN
+  PRINCIPAL
+  GATEKEEPER
+}
+
+enum LeaveType{
+  SPECIAL
+  REGULAR
+}
+
+enum LeaveStatus{
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+  EXPIRED
+}
+
+enum WorkflowTier{
+  PARENT_REVIEW
+  MENTOR_REVIEW
+  HOD_REVIEW
+  WARDEN_REVIEW
+  PRINCIPAL_REVIEW
+  GATEKEEPER_REVIEW
+  COMPLETED
+  ARCHIEVED_REJECTED
+  EXPIRED
+}
+
+model Department{
+  id String @id@default(uuid())
+  name String @unique
+  users User[]
+}
+
+model User{
+  id String @id@default(uuid())
+  name String 
+  email String 
+  passwordHash String
+  role Role @default(STUDENT)
+
+  //Academic grouping
+  departmentId String? //optional because the parent and gatekeeper won't have This
+  department Department? @relation(fields:[departmentId],references:[id])
+  section String?
+  semester Int?
+
+  //Parent Linkage
+  parentId String?
+  parent User? @relation("ParentToStudent",fields:[parentId],references:[id])
+  student User[] @relation("ParentToStudent")
+
+  //Relationships to easily query
+  submittedLeaves LeaveRequest[]
+  logs WorkflowLog[]
+
+  createdAt DateTime @default(now())
+}
+
+model LeaveRequest{
+  id String @id@default(uuid())
+  reason String 
+  startDate DateTime
+  endDAte DateTime
+  type LeaveType @default(SPECIAL)
+  outTime DateTime
+  inTime DateTime
+  studentId String
+  student User @relation(fields:[studentId],references:[id])
+
+  logs WorkflowLog[]
+
+  createdAt DateTime @default(now())
+}
+
+model WorkflowLog{
+  id String @id@default(uuid())
+  leaveRequestId String
+  leaveRequest LeaveRequest @relation(fields:[leaveRequestId],references:[id])
+
+  actorId String
+  actor User @relation(fields:[actorId],references:[id])
+
+  tier WorkflowTier @default(PARENT_REVIEW)
+  action LeaveStatus @default(PENDING)
+  remarks String? //optional because the approval doesn't requires any remarks
+
+  createdAt DateTime @default(now())
 }

@@ -1,7 +1,7 @@
 // src/types/user-roll.ts
 
 export type UserRoll = 
-  | "student" 
+  | "Student" 
   | "Parent" 
   | "Mentor" 
   | "Hod" 
