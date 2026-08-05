@@ -18,7 +18,10 @@ enum Role{
 }
 
 enum LeaveType{
-  SPECIAL
+  OUTING
+  EMERGENCY
+  FUNCTION
+  PERSONAL_WORK
   REGULAR
 }
 
@@ -37,6 +40,7 @@ enum WorkflowTier{
   WARDEN_REVIEW
   PRINCIPAL_REVIEW
   GATEKEEPER_REVIEW
+  WENT_OUT
   COMPLETED
   ARCHIEVED_REJECTED
   EXPIRED
@@ -51,7 +55,7 @@ model Department{
 model User{
   id String @id@default(uuid())
   name String 
-  email String 
+  email String @unique
   passwordHash String
   role Role @default(STUDENT)
 
@@ -77,10 +81,14 @@ model LeaveRequest{
   id String @id@default(uuid())
   reason String 
   startDate DateTime
-  endDAte DateTime
-  type LeaveType @default(SPECIAL)
-  outTime DateTime
-  inTime DateTime
+  endDate DateTime
+  type LeaveType @default(OUTING)
+  outTime DateTime?
+  inTime DateTime?
+  
+  status LeaveStatus @default(PENDING)
+  tier WorkflowTier @default(PARENT_REVIEW)
+
   studentId String
   student User @relation(fields:[studentId],references:[id])
 
@@ -97,7 +105,6 @@ model WorkflowLog{
   actorId String
   actor User @relation(fields:[actorId],references:[id])
 
-  tier WorkflowTier @default(PARENT_REVIEW)
   action LeaveStatus @default(PENDING)
   remarks String? //optional because the approval doesn't requires any remarks
 
