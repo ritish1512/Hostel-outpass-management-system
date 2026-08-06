@@ -16,7 +16,7 @@ export default async function Home() {
     return <LoginPage />;
   }
 
-  const outpasses = await fetchOutpass();
+  const outpasses = (await fetchOutpass()) as any[];
   const role = String(session.user.role).toUpperCase();
 
   switch (role) {

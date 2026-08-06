@@ -11,9 +11,14 @@ export async function requestLeave(
     type: LeaveType = LeaveType.OUTING 
 ): Promise<LeaveRequest> {
     const onProcess = await prisma.leaveRequest.findMany({
-        where:{studentId,status:LeaveStatus.PENDING || LeaveStatus.APPROVED}
+        where: {
+            studentId,
+            status: {
+                in: [LeaveStatus.PENDING, LeaveStatus.APPROVED]
+            }
+        }
     });
-    if(onProcess)throw new Error("Your Previous outpass is on process");
+    if(onProcess.length>0)throw new Error("Your Previous outpass is on process");
     try {
         const leaveRequest = await prisma.leaveRequest.create({
             data: {

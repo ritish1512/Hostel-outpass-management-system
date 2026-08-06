@@ -50,10 +50,10 @@ export async function handleReviewAction(
     };
 
     const requiredRole = tierRoleMap[outPass.tier];
-    if (requiredRole && actor.role !== requiredRole) {
+    if (requiredRole && actor.role !== requiredRole){
         throw new Error(`Unauthorized action: only ${requiredRole.toLowerCase()} can process tier ${outPass.tier}.`);
     }
-
+    
     const dbActionStatus = action === "APPROVED" ? LeaveStatus.APPROVED : LeaveStatus.REJECTED;
 
     if (dbActionStatus === LeaveStatus.REJECTED) {
@@ -110,7 +110,7 @@ export async function handleReviewAction(
             data: baseData
         }),
         prisma.workflowLog.create({
-            data: { leaveRequestId: requestId, actorId, action: dbActionStatus, remarks }
+            data: { leaveRequestId: requestId, actorId, action: dbActionStatus }
         })
     ]);
 }
