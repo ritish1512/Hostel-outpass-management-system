@@ -38,11 +38,11 @@ export default function Parentdashboard({outpasses,actorId}:ParentDashboardProps
   const [loading,setloading] = useState<boolean>(false);
   const [openRemarks,setOpenRemarks] = useState<boolean>(false);
 
-  const handleRespond = (action:"APPROVED"|"REJECTED")=>{
+  const handleRespond = async(action:"APPROVED"|"REJECTED")=>{
     setloading(true);
     if(action  === "REJECTED" && !remarks)throw new Error("Pleave fill out the remarks");
     try{
-      handleReviewAction(currentOutpass.id,actorId,action,remarks);
+      await handleReviewAction(currentOutpass.id, actorId, action, remarks);
       alert("You action is submitted.");
       window.location.reload();
     }catch{

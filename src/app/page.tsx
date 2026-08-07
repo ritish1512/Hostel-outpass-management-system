@@ -9,6 +9,8 @@ import Principaldashboard from "@/components/dashboard/Principaldashboard";
 import Studentdashboard from "@/components/dashboard/Studentdashboard";
 import Wardendashboard from "@/components/dashboard/Wardendashboard";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const session = await auth();
 

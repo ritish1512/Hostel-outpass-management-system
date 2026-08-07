@@ -15,4 +15,5 @@ body {
   scrollbar-width: thin;
   scrollbar-color: var(--foreground) var(--background);
   font-family: var(--font-poppins);
+  overflow-x: hidden;
 }

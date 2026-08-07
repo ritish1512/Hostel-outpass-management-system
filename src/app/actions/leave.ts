@@ -26,7 +26,6 @@ export async function handleReviewAction(
         prisma.leaveRequest.findUnique({ where: { id: requestId } }),
         prisma.user.findUnique({ where: { id: actorId } }),
     ]);
-
     if (!outPass) {
         console.log("Error happened in src/app/actions/leave.ts: Outpass not found");
         throw new Error("There is a problem with fetching the outpass");
