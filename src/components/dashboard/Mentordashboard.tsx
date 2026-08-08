@@ -2,8 +2,9 @@
 import { handleReviewAction } from "@/app/actions/leave";
 import dashboardProps from "@/types/dashboard";
 import { useState } from "react";
+import { RemarksModel } from "../ui/RemarksModel";
 
-export default function Mentordashboard({ outpasses, actorId }: dashboardProps) {
+export default function Mentordashboard({ outpasses,actorName}: dashboardProps) {
   const [outPassIds, setOupassIds] = useState<string[] >([]);
   const [expandedId, SetExpandedId] = useState<string | null>("");
   
@@ -24,7 +25,7 @@ export default function Mentordashboard({ outpasses, actorId }: dashboardProps) 
     }
     setLoadingId(requestId);
     try {
-      await handleReviewAction(requestId, actorId, action, correspondingRemarks);
+      await handleReviewAction(requestId, action, correspondingRemarks);
       alert(`Request successfully marked as ${action}`);
       window.location.reload();
     } catch (err) {
@@ -42,7 +43,7 @@ export default function Mentordashboard({ outpasses, actorId }: dashboardProps) 
     try {
       for (const id of outPassIds) {
         const note = remarks[id] || "";
-        await handleReviewAction(id, actorId, action, note);
+        await handleReviewAction(id, action, note);
       }
       alert(`Bulk execution complete: ${outPassIds.length} requests updated.`);
       window.location.reload();
@@ -56,6 +57,7 @@ export default function Mentordashboard({ outpasses, actorId }: dashboardProps) 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
+        <div className="text-2xl font-bold text-slate-800 tracking-tight">Welcome {actorName}</div>
         
         {/* DASHBOARD HEADER & BULK CONTROLS */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
@@ -195,52 +197,13 @@ export default function Mentordashboard({ outpasses, actorId }: dashboardProps) 
             )}
           </div>
 
-          {/* POPUP MODAL FOR REMARKS (Rendered Globally Outside the Loop) */}
-          {activeRejectId !== null && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-              <div className="w-full max-w-md p-6 bg-white border border-slate-200 shadow-2xl rounded-2xl animate-in zoom-in-95 duration-200">
-                <h2 className="font-bold text-xl text-slate-900 mb-1">Reject Outpass Application</h2>
-                <p className="text-sm text-slate-500 mb-4">Please provide an explicit reason explaining this request cancellation.</p>
-                
-                <div className="flex flex-col gap-4">
-                  <input
-                    name="remarks"
-                    value={remarks[activeRejectId] ?? ""}
-                    onChange={(e) => setRemarks({ ...remarks, [activeRejectId]: e.target.value })}
-                    type="text"
-                    maxLength={50}
-                    placeholder="Type reason here (max 50 chars)..."
-                    className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all text-sm text-slate-800"
-                    autoFocus
-                  />
+          <RemarksModel 
+          isOpen={activeRejectId !== null}
+          value={activeRejectId? (remarks[activeRejectId]??""):""} 
+          onChange={(newValue)=>activeRejectId && setRemarks({...remarks,[activeRejectId]:newValue})}
+          onCancel={()=>setActiveRejectId(null)}
+          onConfirm={()=>activeRejectId && handleDecision(activeRejectId,"REJECTED")}/>
 
-                  {/* Modal Action Buttons CONTAINER FIXED */}
-                  <div className="flex gap-3 justify-end mt-2">
-                    <button
-                      type="button"
-                      onClick={(e) => { e.preventDefault(); setActiveRejectId(null); }}
-                      className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-sm transition-all"
-                    >
-                      Cancel
-                    </button>
-                    
-                    <button
-                      type="button"
-                      disabled={!(remarks[activeRejectId] || "").trim()}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleDecision(activeRejectId, "REJECTED");
-                        setActiveRejectId(null);
-                      }}
-                      className="px-4 py-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium rounded-xl text-sm transition-all shadow-sm"
-                    >
-                      Confirm Rejection
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
     </div>
   );

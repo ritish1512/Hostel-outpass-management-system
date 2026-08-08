@@ -1,8 +1,9 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { signIn,getSession } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { UserRole } from "@/types/user-role";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -33,7 +34,12 @@ export default function LoginPage() {
         alert(error);
         setError("Invalid email or password");
       } else {
-        router.push("/");
+        const session = await getSession();
+        if(session?.user?.role === "Principal" as UserRole){
+          router.push("/principal");
+        } else {
+          router.push("/");
+        }
         router.refresh();
       }
     } catch (err) {

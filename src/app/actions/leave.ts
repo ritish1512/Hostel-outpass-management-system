@@ -2,6 +2,7 @@
 
 import { LeaveStatus, Role, WorkflowTier } from "@/generated/prisma";
 import prisma from "@/lib/prisma";
+import { auth } from "@/auth";
 
 const nextTier: Record<WorkflowTier, WorkflowTier> = { 
     PARENT_REVIEW: WorkflowTier.MENTOR_REVIEW,
@@ -17,11 +18,15 @@ const nextTier: Record<WorkflowTier, WorkflowTier> = {
 };
 
 export async function handleReviewAction(
-    requestId: string, 
-    actorId: string, 
+    requestId: string,
     action: "APPROVED" | "REJECTED", 
     remarks?: string
 ) {
+    const session = await auth();
+    if(!session){
+        throw new Error("please login again");
+    }
+    const actorId = session.user.id;
     const [outPass, actor] = await Promise.all([
         prisma.leaveRequest.findUnique({ where: { id: requestId } }),
         prisma.user.findUnique({ where: { id: actorId } }),

@@ -1,38 +1,11 @@
 "use client";
 import { handleReviewAction } from "@/app/actions/leave";
 import { useState } from "react";
-import { LeaveType } from "@/generated/prisma";
-
-export interface department{
-  name:string,
-}
-export interface student{
-  name:string,
-  semester:number,
-  section:string,
-  department:department
-}
-export interface outpass{
-  id: string;
-  studentId: string;
-  startDate: Date|string;
-  endDate: Date|string;
-  reason: string;
-  type: LeaveType;
-  student:student;
-  status: string;
-  tier: string;
-  createdAt: Date|string;
-  outTime?: Date|string | null;
-  inTime?: Date|string | null;
-}
-interface ParentDashboardProps {
-  outpasses: outpass[];
-  actorId: string;
-}
+import dashboardProps from "@/types/dashboard";
+import { RemarksModel } from "../ui/RemarksModel";
 
 
-export default function Parentdashboard({outpasses,actorId}:ParentDashboardProps){
+export default function Parentdashboard({outpasses,actorName}:dashboardProps){
   const currentOutpass = outpasses[0];
   const [remarks,setRemarks] = useState<string>("");
   const [loading,setloading] = useState<boolean>(false);
@@ -42,7 +15,7 @@ export default function Parentdashboard({outpasses,actorId}:ParentDashboardProps
     setloading(true);
     if(action  === "REJECTED" && !remarks)throw new Error("Pleave fill out the remarks");
     try{
-      await handleReviewAction(currentOutpass.id, actorId, action, remarks);
+      await handleReviewAction(currentOutpass.id,action, remarks);
       alert("You action is submitted.");
       window.location.reload();
     }catch{
@@ -58,7 +31,7 @@ export default function Parentdashboard({outpasses,actorId}:ParentDashboardProps
 
   return(
     <div className="relative flex flex-col items-center justify-center h-[calc(dvh-25%)] p-4 sm:p-6 bg-slate-50 gap-6 w-full max-w-4xl mx-auto">
-  
+      <div className="text-2xl font-bold text-slate-800 tracking-tight">Welcome {actorName}</div>
   {/* Container for Info Blocks */}
   <div className="flex flex-col md:flex-row gap-6 w-full justify-center items-stretch">
     
@@ -106,50 +79,14 @@ export default function Parentdashboard({outpasses,actorId}:ParentDashboardProps
     </div>
   </div>
 
-  {/* Popup Modal for Remarks */}
-  {openRemarks && (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      
-      {/* Modal Content Box */}
-      <div className="w-full max-w-md p-6 bg-white border border-slate-200 shadow-2xl rounded-2xl animate-in zoom-in-95 duration-200">
-        <h2 className="font-bold text-xl text-slate-900 mb-2">Reject Outpass</h2>
-        <p className="text-sm text-slate-500 mb-4">Please provide a reason for revoking this outpass application.</p>
-        
-        <div className="flex flex-col gap-4">
-          <input 
-            name="remarks" 
-            value={remarks} 
-            onChange={(e) => setRemarks(e.target.value)} 
-            type="text" 
-            maxLength={50} 
-            placeholder="Type reason here (max 50 chars)..."
-            className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all text-sm text-slate-800"
-            autoFocus
-          />
-          
-          {/* Modal Action Buttons */}
-          <div className="flex gap-3 justify-end mt-2">
-            <button
-              type="button"
-              onClick={(e) => { e.preventDefault(); setOpenRemarks(false); }}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg text-sm transition-all"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              disabled={!remarks.trim()}
-              onClick={(e) => { e.preventDefault(); handleRespond("REJECTED"); setOpenRemarks(false); }}
-              className="px-4 py-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg text-sm transition-all"
-            >
-              Confirm Rejection
-            </button>
-          </div>
-        </div>
-      </div>
+  <RemarksModel 
+  isOpen={openRemarks} 
+  value={remarks} 
+  onChange={(newValue:string)=>setRemarks(newValue)}
+  onCancel={()=>setOpenRemarks(false)}
+  onConfirm={()=>handleRespond("REJECTED")}/>
 
-    </div>
-  )}
+
 </div>
 );
 }

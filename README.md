@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Campus Outpass System
 
-## Getting Started
+A modern campus outpass management platform built with Next.js, TypeScript, Prisma, PostgreSQL, and role-based workflow automation.
 
-First, run the development server:
+## What this project delivers
+
+This application is designed to simplify and secure the student outpass request lifecycle on campus. It supports:
+
+- Multi-role authentication and authorization for students, parents, mentors, HODs, wardens, principals, and gatekeepers
+- Structured leave request submission and tracking
+- Sequential review and approval workflows with tiered escalation
+- Detailed audit logs for every decision and action taken
+- Department mapping, parent linkage, and academic context for each student
+
+## Key features
+
+- Role-based dashboards for all stakeholders
+- Leave request management with type, status, and workflow tier tracking
+- Approval, rejection, and completion flows for campus exit permissions
+- Secure password hashing with `bcryptjs`
+- PostgreSQL-backed persistence via Prisma ORM
+- Clean Next.js app routing and UI layout
+
+## Tech stack
+
+- `Next.js` 16 — server-rendered React framework with app directory support
+- `TypeScript` — static typing for safer, maintainable code
+- `Prisma` — type-safe database access layer
+- `PostgreSQL` — relational database for production-ready data integrity
+- `next-auth` — secure authentication flows
+- `bcryptjs` — password hashing for user security
+- `Tailwind CSS` — utility-first styling and consistent layout
+
+## Domain model overview
+
+This project models a real-world campus workflow with the following core entities:
+
+- `User` — student, parent, mentor, HOD, warden, principal, gatekeeper
+- `Department` — academic department mapping
+- `LeaveRequest` — outpass request with reason, dates, type, status, and workflow tier
+- `WorkflowLog` — audit trail for each approval, rejection, and action
+
+The leave lifecycle is governed by strong state management via enums such as `LeaveStatus` and `WorkflowTier`.
+
+## Installation
+
+```bash
+cd Outpass
+npm install
+```
+
+## Local development
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000` in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Database setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Configure your PostgreSQL connection in `prisma/.env` or your environment.
+2. Run Prisma migrations:
 
-## Learn More
+```bash
+npx prisma migrate deploy
+```
 
-To learn more about Next.js, take a look at the following resources:
+3. Generate the Prisma client:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npx prisma generate
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project structure
 
-## Deploy on Vercel
+- `src/app` — Next.js app routes and pages
+- `src/components` — dashboard and shared UI components
+- `src/lib/prisma.ts` — Prisma client initialization
+- `src/types` — shared TypeScript role and dashboard types
+- `prisma/schema.prisma` — database schema, models, and relations
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Why this project stands out
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This system is built as a polished, enterprise-ready campus management tool with a complete approval workflow and audit capability. It demonstrates:
+
+- End-to-end application design from database modeling to frontend user flows
+- Multi-user role coordination and secure authorization
+- Practical use of modern full-stack tooling in a real-world campus operations context
+
+## Next steps
+
+Potential enhancements for recruiters and product owners:
+
+- Add user registration and invitation flows
+- Implement email or in-app notifications for workflow updates
+- Add analytics and reporting dashboards for administrators
+- Improve UX with mobile-responsive design and accessibility support

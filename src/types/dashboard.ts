@@ -24,5 +24,5 @@ export interface outpass{
 }
 export default interface dashboardProps {
   outpasses: outpass[];
-  actorId: string;
+  actorName: string;
 }
