@@ -18,6 +18,7 @@ export default function Principaldashboard({ outpasses, actorName }: dashboardPr
   const [bulkRejection, setBulkRejection] = useState<string>("");
   const [selectedDepartment, setSelectedDepartment] = useState<string>("ALL");
   const [selectedLeaveType, setSelectedLeaveType] = useState<LeaveType | "ALL">("ALL");
+  const [selectedSemester,setSelectedSemester] = useState<number | "ALL">("ALL")
 
   const departmentOptions = [
     "ALL",
@@ -29,10 +30,13 @@ export default function Principaldashboard({ outpasses, actorName }: dashboardPr
     ...Array.from(new Set(outpasses.map((pass) => pass.type)))
   ] as Array<LeaveType | "ALL">;
 
+  const semesterOptions = ["ALL",...Array.from(new Set(outpasses.map((pass)=>pass.student?.semester)))] as Array<number | "ALL">;
+
   const filteredOutpasses = outpasses.filter((pass) => {
     const departmentMatches = selectedDepartment === "ALL" || pass.student.department?.name === selectedDepartment;
     const leaveTypeMatches = selectedLeaveType === "ALL" || pass.type === selectedLeaveType;
-    return departmentMatches && leaveTypeMatches;
+    const semesterMatches = selectedSemester === "ALL" || pass.student.semester === selectedSemester;
+    return departmentMatches && leaveTypeMatches && semesterMatches;
   });
 
   const filteredSelectedCount = filteredOutpasses.filter((pass) => outPassIds.includes(pass.id)).length;
@@ -176,6 +180,21 @@ export default function Principaldashboard({ outpasses, actorName }: dashboardPr
                 {leaveTypeOptions.map((leaveType) => (
                   <option key={leaveType} value={leaveType}>
                     {leaveType === "ALL" ? "ALL" : leaveType.replaceAll("_", " ")}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="space-y-2">
+              <span className="block text-sm font-semibold text-slate-600">Semester</span>
+              <select
+                value={selectedSemester}
+                onChange={(event) =>{const value=event.target.value;setSelectedSemester(value === "ALL" ? "ALL" : Number(value));}}
+                className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-800 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+              >
+                {semesterOptions.map((semester) => (
+                  <option key={semester} value={semester}>
+                    {semester === "ALL" ? "ALL" : semester}
                   </option>
                 ))}
               </select>

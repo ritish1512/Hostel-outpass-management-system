@@ -26,7 +26,7 @@ export default function Parentdashboard({outpasses,actorName}:dashboardProps){
   }
   
   if (!currentOutpass) {
-  return <div className="p-6 text-slate-500 text-center  font-black tracking-tight mt-[50%]">There is no OUTPASS</div>;
+  return <div className="p-6 text-slate-500 text-center  font-black tracking-tight py-50">There is no OUTPASS</div>;
  }
 
   return(
