@@ -46,6 +46,13 @@ enum WorkflowTier{
   EXPIRED
 }
 
+enum Hostel{
+  NBH
+  OBH
+  NGH
+  OGN
+}
+
 model Department{
   id String @id@default(uuid())
   name String @unique
@@ -64,11 +71,16 @@ model User{
   department Department? @relation(fields:[departmentId],references:[id])
   section String?
   semester Int?
+  
+  //Hostel details for student and WARDEN
+  HostelName Hostel?
+  HostelRoomNo Int?
 
   //Parent Linkage
   parentId String?
   parent User? @relation("ParentToStudent",fields:[parentId],references:[id])
   student User[] @relation("ParentToStudent")
+
 
   //Relationships to easily query
   submittedLeaves LeaveRequest[]
