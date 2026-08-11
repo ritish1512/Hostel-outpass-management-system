@@ -79,9 +79,9 @@ model User{
   //Parent Linkage
   parentId String?
   parent User? @relation("ParentToStudent",fields:[parentId],references:[id])
-  student User[] @relation("ParentToStudent")
+  parent User[] @relation("ParentToStudent")
 
-
+  
   //Relationships to easily query
   submittedLeaves LeaveRequest[]
   logs WorkflowLog[]

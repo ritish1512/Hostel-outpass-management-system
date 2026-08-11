@@ -6,9 +6,10 @@ export interface student{
   name:string,
   semester:number,
   section:string,
-  department:department
+  department:department,
+  HostelRoomNo:number
 }
-export interface outpass{
+export interface IOutpass{
   id: string;
   studentId: string;
   startDate: Date|string;
@@ -23,6 +24,6 @@ export interface outpass{
   inTime?: Date|string | null;
 }
 export default interface dashboardProps {
-  outpasses: outpass[];
+  outpasses: IOutpass[];
   actorName: string;
 }

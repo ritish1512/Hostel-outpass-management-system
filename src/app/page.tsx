@@ -9,6 +9,7 @@ import Parentdashboard from "@/components/dashboard/Parentdashboard";
 import Principaldashboard from "@/components/dashboard/Principaldashboard";
 import Studentdashboard from "@/components/dashboard/Studentdashboard";
 import Wardendashboard from "@/components/dashboard/Wardendashboard";
+import { IOutpass } from "@/types/dashboard";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,7 @@ export default async function Home() {
     return <LoginPage />;
   }
   const actorname = await prisma.user.findUnique({where:{id: session.user.id},select:{name:true}});
-  const outpasses = (await fetchOutpass()) as any[];
+  const outpasses = (await fetchOutpass()) as IOutpass[];
   const role = String(session.user.role).toUpperCase();
 
   switch (role) {
