@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { fetchOutpass } from "@/app/actions/fetchOutpass";
-import LoginPage from "@/components/LoginPage";
+import LoginPage from "@/components/authentication/LoginPage";
 import GatekeeperDashboard from "@/components/dashboard/Gatekeeperdashboard";
 import Hoddashboard from "@/components/dashboard/Hoddashboard";
 import Mentordashboard from "@/components/dashboard/Mentordashboard";
