@@ -1,3 +1,3 @@
-export default function Gatekeeperdashboard({outpasses,actorId}:any){
+export default function Gatekeeperdashboard(){
   return(<div>Gate keeper</div>);
 }
