@@ -31,9 +31,12 @@ export default function StudentDashboard({ outpasses, studentId }: StudentDashbo
   const [type, setType] = useState<LeaveType>("OUTING");
   const [loading, setLoading] = useState(false);
 
+
+
   const latestOutpass = outpasses[0];
-  const onProcess = latestOutpass.status === LeaveStatus.PENDING;
-  const approved = latestOutpass.status === LeaveStatus.APPROVED;
+  const latestOutpassId = latestOutpass?.id;
+  const onProcess = latestOutpass?.status === LeaveStatus.PENDING;
+  const approved = latestOutpass?.status === LeaveStatus.APPROVED;
   
   const steps =[WorkflowTier.PARENT_REVIEW,WorkflowTier.MENTOR_REVIEW,WorkflowTier.HOD_REVIEW,WorkflowTier.PRINCIPAL_REVIEW,WorkflowTier.WARDEN_REVIEW,WorkflowTier.GATEKEEPER_REVIEW];
   const currentStepIndex = onProcess ? steps.findIndex(step => step === latestOutpass.tier) : -1;
@@ -83,7 +86,7 @@ export default function StudentDashboard({ outpasses, studentId }: StudentDashbo
         <>
         <div>
           <h2 className="font-bold text-2xl p-4 ">Pass Process</h2>
-          <span>{latestOutpass.id}</span>
+          <span>{latestOutpass?.id}</span>
             <div className="flex flex-col gap-2 p-4 bg-slate-100 border-slate-400 shadow shadow-slate-200 ring-2 ring-slate-300  text-gray-800 rounded-md max-w-[95%] mx-auto">
               {steps.map((step, index) => {
                 return (
@@ -102,7 +105,7 @@ export default function StudentDashboard({ outpasses, studentId }: StudentDashbo
             {/* QR Code Container */}
             <div className="relative p-4 bg-slate-50 rounded-xl border border-slate-200 shadow-inner mb-6">
               <img 
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(latestOutpass.id)}`} 
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(latestOutpassId)}`}
                 alt="Outpass QR code" 
                 className="w-55 h-55 rounded-lg object-contain bg-white" 
               />
@@ -114,7 +117,7 @@ export default function StudentDashboard({ outpasses, studentId }: StudentDashbo
             </span>
             <span className="text-lg font-extrabold text-slate-900 tracking-tight leading-snug">
               GET SCANNED BY GATEKEEPER TO 
-              {latestOutpass.tier===WorkflowTier.WENT_OUT ? " ENTER COLLEGE":" GO OUT"}
+              {latestOutpass?.tier===WorkflowTier.WENT_OUT ? " ENTER COLLEGE":" GO OUT"}
             </span>
             
           </div>
