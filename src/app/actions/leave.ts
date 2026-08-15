@@ -85,6 +85,7 @@ export async function handleReviewAction(
     let newStatus: LeaveStatus = LeaveStatus.PENDING;
     switch (nextTierValue) {
         case WorkflowTier.GATEKEEPER_REVIEW:
+        case WorkflowTier.WENT_OUT:
             newStatus = LeaveStatus.APPROVED;
             break;
         case WorkflowTier.COMPLETED:

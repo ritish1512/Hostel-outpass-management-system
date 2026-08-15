@@ -67,6 +67,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 mt-1 border rounded focus:outline-none focus:ring focus:border-blue-300 text-black"
               required
+              suppressHydrationWarning
             />
           </div>
 
