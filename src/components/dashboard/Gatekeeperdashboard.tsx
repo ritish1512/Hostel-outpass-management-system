@@ -62,7 +62,7 @@ export default function GatekeeperDashboard() {
         </div>
 
         {/* Scanner Body Wrap */}
-        <div className="relative rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-4 min-h-[300px] flex items-center justify-center overflow-hidden">
+        <div className="relative rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-4 min-h-75 flex items-center justify-center overflow-hidden">
           <div 
             id="scanner" 
             className="w-full h-full [&_video]:rounded-lg [&_video]:object-cover [&_button]:mt-4 [&_button]:px-4 [&_button]:py-2 [&_button]:bg-indigo-600 [&_button]:text-white [&_button]:font-medium [&_button]:rounded-lg [&_button]:shadow-sm [&_button]:hover:bg-indigo-700 [&_button]:transition-all [&_a]:text-indigo-600" 

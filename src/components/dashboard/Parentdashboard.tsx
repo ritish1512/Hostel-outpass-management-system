@@ -2,7 +2,7 @@
 import { handleReviewAction } from "@/app/actions/leave";
 import { useState } from "react";
 import dashboardProps from "@/types/dashboard";
-import { RemarksModel } from "../ui/RemarksModel";
+import { RemarksModel } from "../feature/RemarksModel";
 
 
 export default function Parentdashboard({outpasses,actorName}:dashboardProps){

@@ -3,8 +3,8 @@ import { LeaveType } from "@/generated/prisma";
 import { handleReviewAction } from "@/app/actions/leave";
 import dashboardProps from "@/types/dashboard";
 import { useState } from "react";
-import { RemarksModel } from "../ui/RemarksModel";
-import RejectionString from "../ui/BulkRejectionConfirmation";
+import { RemarksModel } from "../feature/RemarksModel";
+import RejectionString from "../feature/BulkRejectionConfirmation";
 
 export default function Principaldashboard({ outpasses, actorName }: dashboardProps) {
   const [outPassIds, setOupassIds] = useState<string[]>([]);

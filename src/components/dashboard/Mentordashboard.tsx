@@ -2,7 +2,7 @@
 import { handleReviewAction } from "@/app/actions/leave";
 import dashboardProps from "@/types/dashboard";
 import { useState } from "react";
-import { RemarksModel } from "../ui/RemarksModel";
+import { RemarksModel } from "../feature/RemarksModel";
 
 export default function Mentordashboard({ outpasses,actorName}: dashboardProps) {
   const [outPassIds, setOupassIds] = useState<string[] >([]);
