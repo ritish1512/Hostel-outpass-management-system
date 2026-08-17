@@ -31,8 +31,6 @@ export default function StudentDashboard({ outpasses, studentId }: StudentDashbo
   const [type, setType] = useState<LeaveType>("OUTING");
   const [loading, setLoading] = useState(false);
 
-
-
   const latestOutpass = outpasses[0];
   const latestOutpassId = latestOutpass?.id;
   const onProcess = latestOutpass?.status === LeaveStatus.PENDING;
@@ -140,9 +138,9 @@ export default function StudentDashboard({ outpasses, studentId }: StudentDashbo
                   <option value={LeaveType.OUTING}>Outing</option>
                   <option value={LeaveType.EMERGENCY}>Emergency</option>
                   <option value={LeaveType.FUNCTION}>Function</option>
-                  <option value = {LeaveType.PERSONAL_WORK}>Personal Work</option>
+                  <option value ={LeaveType.PERSONAL_WORK}>Personal Work</option>
                 </select>
-              </div> 
+              </div>
           </div>
           <div className="flex flex-col gap-2 md:w-[80%]">
             <label htmlFor="reason" className="py-1 px-2 bg-slate-300 border-slate-400 shadow-slate-200 ring-2 ring-slate-300 text-gray-800 rounded-md">Reason:</label>

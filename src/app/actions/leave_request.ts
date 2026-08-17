@@ -9,18 +9,34 @@ export async function requestLeave(
     toDate: Date | string |number,
     reason: string,
     type: LeaveType = LeaveType.OUTING 
-): Promise<LeaveRequest> {
-    const onProcess = await prisma.leaveRequest.findMany({
+) {
+    const outPasses = await prisma.leaveRequest.findMany({
         where: {
             studentId,
-            status: {
-                in: [LeaveStatus.PENDING, LeaveStatus.APPROVED]
-            }
+        },
+        orderBy:{
+            createdAt:"desc" as const,
         }
     });
-    if(onProcess.length>0)throw new Error("Your Previous outpass is on process");
-    const now= new Date();
-    if(fromDate<now || toDate<fromDate)throw new Error("Please enter the proper date and time");
+    if(outPasses[0].status=== LeaveStatus.PENDING || outPasses[0].status=== LeaveStatus.APPROVED)
+        throw new Error("Your Previous outpass is on process");
+
+    const now = new Date();
+    if(fromDate<now || toDate<fromDate)
+        throw new Error("Please enter the proper date and time");
+
+    if(outPasses[0].status===LeaveStatus.REJECTED){
+        const rejectedTime = await prisma.workflowLog.findFirst({
+            where:{
+                leaveRequestId:outPasses[0].id,
+            },
+            select:{
+                createdAt:true,
+            }
+        });
+        const cooldownTime = 24*60*60*1000;
+    }
+    
     try {
         const leaveRequest = await prisma.leaveRequest.create({
             data: {

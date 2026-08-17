@@ -37,7 +37,7 @@ export default async function Home() {
     case "PRINCIPAL":
       return <Principaldashboard outpasses={outpasses} actorName={actorname?.name ?? "Guest"} />;
     case "GATEKEEPER":
-      return <GatekeeperDashboard outpasses={outpasses} actorName={actorname?.name ?? "Guest"} />;
+      return <GatekeeperDashboard/>;
     default:
       return <LoginPage />;
   }
