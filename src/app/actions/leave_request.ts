@@ -5,11 +5,13 @@ import prisma from "@/lib/prisma";
 
 export async function requestLeave(
     studentId: string,
-    fromDate: Date | string|number,
-    toDate: Date | string |number,
+    fromDateString: string,
+    toDateString: string,
     reason: string,
     type: LeaveType = LeaveType.OUTING 
 ) {
+    const fromDate = new Date(fromDateString);
+    const toDate = new Date(toDateString);
     const outPasses = await prisma.leaveRequest.findMany({
         where: {
             studentId,
@@ -18,13 +20,18 @@ export async function requestLeave(
             createdAt:"desc" as const,
         }
     });
+    //check for outpass that is already in process
     if(outPasses[0].status=== LeaveStatus.PENDING || outPasses[0].status=== LeaveStatus.APPROVED)
         throw new Error("Your Previous outpass is on process");
 
+    //check for the from and to date integrity and consitency
     const now = new Date();
-    if(fromDate<now || toDate<fromDate)
-        throw new Error("Please enter the proper date and time");
+    if(fromDate<now)
+        throw new Error("Cannot apply for an outpass for a time in the past");
+    if(fromDate>toDate)
+        throw new Error("you can't come before you go");
 
+    //Process for the rejected outpass
     if(outPasses[0].status===LeaveStatus.REJECTED){
         const rejectedTime = await prisma.workflowLog.findFirst({
             where:{
@@ -35,6 +42,9 @@ export async function requestLeave(
             }
         });
         const cooldownTime = 24*60*60*1000;
+        const allowedTime = new Date(rejectedTime?.createdAt.getTime() as number + cooldownTime).toLocaleString('en-US');
+
+        throw new Error("Try at " + allowedTime as unknown as string);
     }
     
     try {

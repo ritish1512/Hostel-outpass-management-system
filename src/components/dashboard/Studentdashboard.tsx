@@ -26,8 +26,8 @@ interface StudentDashboardProps {
 export default function StudentDashboard({ outpasses, studentId }: StudentDashboardProps) {
   // Form State Configurations
   const [reason, setReason] = useState("");
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
+  const [fromDateString, setfromDateString] = useState("");
+  const [toDateString, settoDateString] = useState("");
   const [type, setType] = useState<LeaveType>("OUTING");
   const [loading, setLoading] = useState(false);
 
@@ -64,11 +64,11 @@ export default function StudentDashboard({ outpasses, studentId }: StudentDashbo
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!reason || !fromDate || !toDate) return alert("Please supply all necessary outpass metrics.");
+    if (!reason || !fromDateString || !toDateString) return alert("Please supply all necessary outpass metrics.");
 
     setLoading(true);
     try {
-      await requestLeave(studentId, fromDate, toDate, reason, type);
+      await requestLeave(studentId, fromDateString, toDateString, reason, type);
       alert("Outpass request successfully created and routed to tracking nodes!");
       window.location.reload();
     } catch (err) {
@@ -80,9 +80,10 @@ export default function StudentDashboard({ outpasses, studentId }: StudentDashbo
 
   return (
     <div>
+    {outpasses[0].tier===WorkflowTier.ARCHIEVED_REJECTED && <div>Rejected thambi</div>}
       {onProcess ? (
         <>
-        <div>
+        <div className="max-w-6xl mx-auto">
           <h2 className="font-bold text-2xl p-4 ">Pass Process</h2>
           <span>{latestOutpass?.id}</span>
             <div className="flex flex-col gap-2 p-4 bg-slate-100 border-slate-400 shadow shadow-slate-200 ring-2 ring-slate-300  text-gray-800 rounded-md max-w-[95%] mx-auto">
@@ -125,12 +126,12 @@ export default function StudentDashboard({ outpasses, studentId }: StudentDashbo
           <form className="flex flex-col gap-5 p-2 relative" onSubmit={handleSubmit}>
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex flex-col gap-2">
-                <label htmlFor="fromDate" className="py-1 px-2 bg-slate-300 border-slate-400 shadow-slate-200 ring-2 ring-slate-300 text-gray-800 rounded-md">From Date:</label>
-                <input type="datetime-local" id="fromDate" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="p-2 outline-none border border-slate-400 shadow-slate-200 ring-2 ring-slate-300 text-gray-800 rounded-md" suppressHydrationWarning/>
+                <label htmlFor="fromDateString" className="py-1 px-2 bg-slate-300 border-slate-400 shadow-slate-200 ring-2 ring-slate-300 text-gray-800 rounded-md">From Date:</label>
+                <input type="datetime-local" id="fromDateString" value={fromDateString} onChange={(e) => setfromDateString(e.target.value)} className="p-2 outline-none border border-slate-400 shadow-slate-200 ring-2 ring-slate-300 text-gray-800 rounded-md" suppressHydrationWarning/>
               </div>
               <div className="flex flex-col gap-2">
-                <label htmlFor="toDate" className="py-1 px-2  bg-slate-300 border-slate-400 shadow-slate-200 ring-2 ring-slate-300 text-gray-800 rounded-md">To Date:</label>
-                <input type="datetime-local" id="toDate" value={toDate} onChange={(e) => setToDate(e.target.value)} className="p-2 outline-none border border-slate-400 shadow-slate-200 ring-2 ring-slate-300 text-gray-800 rounded-md" suppressHydrationWarning/>
+                <label htmlFor="toDateString" className="py-1 px-2  bg-slate-300 border-slate-400 shadow-slate-200 ring-2 ring-slate-300 text-gray-800 rounded-md">To Date:</label>
+                <input type="datetime-local" id="toDateString" value={toDateString} onChange={(e) => settoDateString(e.target.value)} className="p-2 outline-none border border-slate-400 shadow-slate-200 ring-2 ring-slate-300 text-gray-800 rounded-md" suppressHydrationWarning/>
               </div>
               <div className="flex flex-col gap-2">
                 <label htmlFor="type" className="py-1 px-2 bg-slate-300 border-slate-400 shadow-slate-200 ring-2 ring-slate-300 text-gray-800 rounded-md">Type:</label>

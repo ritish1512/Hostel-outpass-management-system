@@ -7,7 +7,7 @@ import { UserRole } from "@/types/user-role";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // பாஸ்வேர்டை காட்ட/மறைக்க புதிய ஸ்டேட்
+  const [showPassword, setShowPassword] = useState(false); 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -33,12 +33,7 @@ export default function LoginPage() {
       if (result?.error) {
         setError("Invalid email or password");
       } else {
-        const session = await getSession();
-        if (session?.user?.role === ("Principal" as UserRole)) {
-          router.push("/principal");
-        } else {
-          router.push("/");
-        }
+        router.push("/");
         router.refresh();
       }
     } catch (err) {
@@ -83,11 +78,13 @@ export default function LoginPage() {
                 onChange={(e) => {setShowPassword(false);setPassword(e.target.value)}}
                 className="w-full px-3 py-2 mt-1 border rounded focus:outline-none focus:ring focus:border-blue-300 text-black pr-12"
                 required
+                suppressHydrationWarning
               />
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => setShowPassword(pass=>!pass)}
                 className="absolute font-semibold right-3 mt-1 text-sm text-sky-700 hover:text-sky-800 cursor-pointer"
+                suppressHydrationWarning
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
@@ -98,6 +95,7 @@ export default function LoginPage() {
             type="submit"
             disabled={loading}
             className="w-full px-4 py-2 font-bold text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring focus:border-blue-300 disabled:opacity-70"
+            suppressHydrationWarning
           >
             {loading ? "Logging in..." : "Login"}
           </button>

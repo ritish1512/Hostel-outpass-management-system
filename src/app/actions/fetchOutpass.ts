@@ -94,9 +94,6 @@ export async function fetchOutpass() {
                         }
                     }
                 }
-            },
-            workflowlog:{
-                
             }
         },
         orderBy: {
