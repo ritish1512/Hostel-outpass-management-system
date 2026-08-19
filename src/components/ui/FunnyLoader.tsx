@@ -48,10 +48,10 @@ export default function FunnyLoader() {
       <div className="relative w-24 h-24 flex items-center justify-center">
         {/* Outer Rotating Loader */}
         <Loader2 className="w-20 h-20 text-zinc-700 animate-[spin_3s_linear_infinite] absolute" />
-        
+
         {/* Inner Faster Loader */}
         <Loader2 className="w-16 h-16 text-amber-400 animate-spin absolute" />
-        
+
         {/* Center Dynamic Icon */}
         <div className="z-10 bg-zinc-950 p-2 rounded-full">
           {ICONS[iconIndex]}

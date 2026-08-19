@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma";
 
 export async function Students_out() {
   const session = await auth();
-   if (!session?.user?.id) {
+  if (!session?.user?.id) {
     throw new Error("You must be logged in to view this data");
   }
   const currentUser = await prisma.user.findUnique({
@@ -21,19 +21,19 @@ export async function Students_out() {
     return await prisma.user.findMany({
       where: {
         HostelName: currentUser?.HostelName,
-        submittedLeaves:{
-            some:{
-                tier:WorkflowTier.WENT_OUT
-            }
+        submittedLeaves: {
+          some: {
+            tier: WorkflowTier.WENT_OUT
+          }
         },
       },
       select: {
-            name: true,
-            HostelRoomNo: true,
+        name: true,
+        HostelRoomNo: true,
       }
     });
   } catch (err) {
-    console.error("Database Error:", err); 
+    console.error("Database Error:", err);
     throw new Error("There is a problem in fetching details");
   }
 }

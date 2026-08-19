@@ -109,7 +109,7 @@ export const WentOutStudent = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Status Tag */}
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200/60 rounded-full">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping absolute" />

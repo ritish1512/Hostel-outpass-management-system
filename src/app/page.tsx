@@ -10,22 +10,25 @@ import Principaldashboard from "@/components/dashboard/Principaldashboard";
 import Studentdashboard from "@/components/dashboard/Studentdashboard";
 import Wardendashboard from "@/components/dashboard/Wardendashboard";
 import { IOutpass } from "@/types/dashboard";
+import { rejectedLog} from "./actions/leave_request";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const session = await auth();
-
+  
   if (!session?.user?.id || !session.user.role) {
     return <LoginPage />;
   }
-  const actorname = await prisma.user.findUnique({where:{id: session.user.id},select:{name:true}});
+  const actorname = await prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true } });
   const outpasses = (await fetchOutpass()) as IOutpass[];
+  const  rejectedlogs =(await rejectedLog(outpasses[0]?.id) as {createdAt: Date;remarks: string | null;})
   const role = String(session.user.role).toUpperCase();
+
 
   switch (role) {
     case "STUDENT":
-      return <Studentdashboard outpasses={outpasses} studentId={session.user.id} />;
+      return <Studentdashboard outpasses={outpasses} studentId={session.user.id} rejectedLog={rejectedlogs} />;
     case "PARENT":
       return <Parentdashboard outpasses={outpasses} actorName={actorname?.name ?? "Guest"} />;
     case "MENTOR":
@@ -37,7 +40,7 @@ export default async function Home() {
     case "PRINCIPAL":
       return <Principaldashboard outpasses={outpasses} actorName={actorname?.name ?? "Guest"} />;
     case "GATEKEEPER":
-      return <GatekeeperDashboard/>;
+      return <GatekeeperDashboard />;
     default:
       return <LoginPage />;
   }

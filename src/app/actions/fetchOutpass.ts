@@ -5,9 +5,9 @@ import { WorkflowTier, Role, LeaveStatus, Hostel } from "@/generated/prisma";
 
 export async function fetchOutpass() {
     const session = await auth();
-    
+
     const currentRole = session?.user?.role?.toUpperCase() as Role;
-    
+
 
     if (!session || !session.user?.id || !currentRole) {
         throw new Error("You are not authorized to view this page");
@@ -25,7 +25,7 @@ export async function fetchOutpass() {
     }
 
     let currentTier: WorkflowTier = "PARENT_REVIEW";
-    let currentHostel: Hostel | undefined = undefined; 
+    let currentHostel: Hostel | undefined = undefined;
 
     switch (currentRole) {
         case Role.PARENT:
@@ -43,8 +43,9 @@ export async function fetchOutpass() {
         case Role.WARDEN:
             currentTier = "WARDEN_REVIEW";
             const wardenHostel = await prisma.user.findUnique({
-            where:{id: session.user.id},
-            select:{HostelName:true}});
+                where: { id: session.user.id },
+                select: { HostelName: true }
+            });
             currentHostel = wardenHostel?.HostelName as Hostel;
             break;
         case Role.GATEKEEPER:
@@ -54,7 +55,7 @@ export async function fetchOutpass() {
             throw new Error("You are not authorized to view this page");
     }
 
-    
+
 
     const baseCondition = {
         where: currentRole === Role.GATEKEEPER
@@ -63,31 +64,31 @@ export async function fetchOutpass() {
                 status: LeaveStatus.APPROVED,
             }
             : currentRole === Role.WARDEN ?
-            {
-                tier: currentTier,
-                status: LeaveStatus.PENDING,
-                student: {
-                    HostelName: currentHostel
-                }
-            }: currentRole === Role.PARENT ?
-            {
-                tier: WorkflowTier.PARENT_REVIEW,
-                status: LeaveStatus.PENDING,
-                student: {
-                    parentId: session?.user?.id,
-                }
-            }:
-            {
-                tier: currentTier,
-                status: LeaveStatus.PENDING,
-            },
+                {
+                    tier: currentTier,
+                    status: LeaveStatus.PENDING,
+                    student: {
+                        HostelName: currentHostel
+                    }
+                } : currentRole === Role.PARENT ?
+                    {
+                        tier: WorkflowTier.PARENT_REVIEW,
+                        status: LeaveStatus.PENDING,
+                        student: {
+                            parentId: session?.user?.id,
+                        }
+                    } :
+                    {
+                        tier: currentTier,
+                        status: LeaveStatus.PENDING,
+                    },
         include: {
             student: {
                 select: {
                     name: true,
                     semester: true,
                     section: true,
-                    HostelRoomNo:true,
+                    HostelRoomNo: true,
                     department: {
                         select: {
                             name: true

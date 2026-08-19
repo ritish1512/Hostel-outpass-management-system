@@ -13,9 +13,9 @@ export default function GatekeeperDashboard() {
   useEffect(() => {
     scannerRef.current = new Html5QrcodeScanner(
       "scanner",
-      { 
-        fps: 30, 
-        qrbox: { width: 250, height: 250 } 
+      {
+        fps: 30,
+        qrbox: { width: 250, height: 250 }
       },
       /* verbose= */ false
     );

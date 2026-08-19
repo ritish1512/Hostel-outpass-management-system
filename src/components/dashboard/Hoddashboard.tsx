@@ -1,20 +1,20 @@
 "use client";
 import { handleReviewAction } from "@/app/actions/leave";
 import dashboardProps from "@/types/dashboard";
-import {useState } from "react";
+import { useState } from "react";
 import { RemarksModel } from "../feature/RemarksModel";
 import RejectionString from "../feature/BulkRejectionConfirmation";
 
-export default function Hoddashboard({ outpasses ,actorName}: dashboardProps) {
-  const [outPassIds, setOupassIds] = useState<string[] >([]); 
+export default function Hoddashboard({ outpasses, actorName }: dashboardProps) {
+  const [outPassIds, setOupassIds] = useState<string[]>([]);
   const [expandedId, SetExpandedId] = useState<string | null>("");
-  
-  const [activeRejectId, setActiveRejectId] = useState<string | null>(null); 
-  const [remarks, setRemarks] = useState<{[key: string]: string }>({});
+
+  const [activeRejectId, setActiveRejectId] = useState<string | null>(null);
+  const [remarks, setRemarks] = useState<{ [key: string]: string }>({});
   const [loadingId, setLoadingId] = useState<string | null>("");
   const [bulkLoading, setBulkLoading] = useState<boolean>(false);
-  const [confirmation,setConfirmation] = useState<boolean>(false);
-  const [bulkRejection,setBulkRejection] = useState<string>("");
+  const [confirmation, setConfirmation] = useState<boolean>(false);
+  const [bulkRejection, setBulkRejection] = useState<string>("");
 
   const toggleSelectOutpass = (id: string) => {
     setOupassIds((prev) => prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]);
@@ -36,10 +36,11 @@ export default function Hoddashboard({ outpasses ,actorName}: dashboardProps) {
       setLoadingId("");
     }
   };
-  const confirmationCheck = ()=>{
-    if(!bulkRejection.toLowerCase().trim().includes("reject")){
-      setBulkRejection("");alert("Please Type \"reject\" to Reject the outpasses");}
-    else{
+  const confirmationCheck = () => {
+    if (!bulkRejection.toLowerCase().trim().includes("reject")) {
+      setBulkRejection(""); alert("Please Type \"reject\" to Reject the outpasses");
+    }
+    else {
       setBulkRejection("");
       handleBulkDecision("REJECTED");
       setConfirmation(false);
@@ -79,22 +80,22 @@ export default function Hoddashboard({ outpasses ,actorName}: dashboardProps) {
           </div>
           {(outPassIds.length === 0 || outPassIds.length === outpasses.length) && (
             <button
-            type="button"
-            disabled={bulkLoading || outpasses.length === 0}
-            onClick={() => {outPassIds.length === outpasses.length?setOupassIds([]):setOupassIds(outpasses.map((pass)=>pass.id))}}
-            className="px-5 py-2.5 text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold text-sm transition-all shadow-md shadow-emerald-100 flex items-center justify-center gap-2 cursor-pointer"
-          >
-            {bulkLoading ? (
-              "Processing..."
-            ) : (
-              <>
-                <span className="h-2 w-2 rounded-full bg-emerald-300 animate-pulse" />
-                {outPassIds.length === outpasses.length? "Deselect All":"Select All"}({outpasses.length})
-              </>
-            )}
-          </button>
+              type="button"
+              disabled={bulkLoading || outpasses.length === 0}
+              onClick={() => { outPassIds.length === outpasses.length ? setOupassIds([]) : setOupassIds(outpasses.map((pass) => pass.id)) }}
+              className="px-5 py-2.5 text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold text-sm transition-all shadow-md shadow-emerald-100 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              {bulkLoading ? (
+                "Processing..."
+              ) : (
+                <>
+                  <span className="h-2 w-2 rounded-full bg-emerald-300 animate-pulse" />
+                  {outPassIds.length === outpasses.length ? "Deselect All" : "Select All"}({outpasses.length})
+                </>
+              )}
+            </button>
 
-            )}
+          )}
           {(outPassIds.length > 0) && (
             <div className="flex items-center duration-600 justify-evenly w-full">
               <span className="text-sm font-medium text-slate-600 bg-slate-100 px-2 py-1 rounded-lg">
@@ -118,115 +119,114 @@ export default function Hoddashboard({ outpasses ,actorName}: dashboardProps) {
               </button>
             </div>
           )}
-          
-          </div>
 
-          {/* OUTPASS CARDS LIST */}
-          <div className="space-y-3">
-            {outpasses.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 text-slate-400">
-                No pending outpasses found.
-              </div>
-            ) : (
-              outpasses.map((pass, idx) => {
-                const isSelected = outPassIds.includes(pass.id);
-                const isExpanded = expandedId === pass.id;
-                const isLoading = loadingId === pass.id;
-
-                return (
-                  <div
-                    key={pass.id}
-                    className={`group bg-white rounded-2xl border transition-all duration-200 shadow-sm hover:shadow-md ${
-                      isSelected ? "border-indigo-500 ring-1 ring-indigo-500" : "border-slate-200"
-                    }`}
-                  >
-                    <div className="p-4 md:p-5 flex flex-col sm:flex-row items-start gap-4">
-                      
-                      {/* Checkbox & Index Column */}
-                      <div className="flex items-center gap-3 self-start sm:self-center shrink-0">
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => toggleSelectOutpass(pass.id)}
-                          className="w-4 h-4 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500 cursor-pointer"
-                        />
-                        <span className="flex items-center justify-center bg-slate-100 border border-slate-200 text-slate-600 text-xs font-semibold rounded-full h-6 w-6">
-                          {idx + 1}
-                        </span>
-                      </div>
-
-                      {/* Main Content Details */}
-                      <div 
-                        onClick={() => SetExpandedId(isExpanded ? null : pass.id)}
-                        className="flex-1 cursor-pointer space-y-1.5"
-                      >
-                        <div className="flex flex-wrap items-baseline gap-x-3">
-                          <h2 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                            {pass.student.name}
-                          </h2>
-                          <span className="text-sm text-slate-500 font-bold">Sec: {pass.student.section}</span>
-                        </div>
-                        
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-600">
-                          <div className="flex items-center gap-1" suppressHydrationWarning>
-                            <span className="text-slate-400 font-medium">From:</span>
-                            <span className="font-semibold text-slate-700">{new Date(pass.startDate).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})}</span>
-                          </div>
-                          <div className="hidden sm:inline text-slate-300">•</div>
-                          <div className="flex items-center gap-1" suppressHydrationWarning>
-                            <span className="text-slate-400 font-medium">To:</span>
-                            <span className="font-semibold text-slate-700">{new Date(pass.endDate).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'})}</span>
-                          </div>
-                        </div>
-
-                        {/* Reason (Collapsible / Dynamic View) */}
-                        {pass.reason && (
-                          <div className={`mt-2 p-3 bg-slate-50 rounded-xl border border-slate-100 transition-all ${isExpanded ? "" : "line-clamp-1 sm:line-clamp-none text-slate-500"}`}>
-                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Reason for leave</p>
-                            <p className="text-sm italic text-slate-700">"{pass.reason}"</p>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Individual Action Action Control Panel */}
-                      <div className="flex sm:flex-col items-center gap-2 w-full sm:w-auto shrink-0 mt-3 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100">
-                        <button
-                          type="button"
-                          disabled={isLoading}
-                          onClick={() => handleDecision(pass.id, "APPROVED")}
-                          className="flex-1 sm:flex-none justify-center w-full sm:w-28 px-4 py-2 text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded-xl font-semibold text-xs transition-colors shadow-sm cursor-pointer inline-flex items-center"
-                        >
-                          {isLoading ? "..." : "Approve"}
-                        </button>
-                        <button
-                          type="button"
-                          disabled={isLoading}
-                          onClick={() => setActiveRejectId(pass.id)}
-                          className="flex-1 sm:flex-none justify-center w-full sm:w-28 px-4 py-2 text-rose-600 bg-rose-50 hover:bg-rose-100 disabled:opacity-50 rounded-xl font-semibold text-xs transition-colors cursor-pointer inline-flex items-center"
-                        >
-                          Reject
-                        </button>
-                      </div>
-
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-
-          <RemarksModel 
-          isOpen={activeRejectId !== null} 
-          value={activeRejectId? (remarks[activeRejectId]??""):""} 
-          onChange={(newValue)=>activeRejectId && setRemarks({...remarks,[activeRejectId]:newValue})}
-          onCancel={()=>setActiveRejectId(null)}
-          onConfirm={()=>activeRejectId && handleDecision(activeRejectId,"REJECTED")}/>
         </div>
-        <RejectionString 
-        isOpen={confirmation} 
-        value={bulkRejection} 
-        onChange={(newValue)=>{setBulkRejection(newValue)}} 
-        onCancel={()=>{setConfirmation(false); setBulkRejection(""); }} 
+
+        {/* OUTPASS CARDS LIST */}
+        <div className="space-y-3">
+          {outpasses.length === 0 ? (
+            <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 text-slate-400">
+              No pending outpasses found.
+            </div>
+          ) : (
+            outpasses.map((pass, idx) => {
+              const isSelected = outPassIds.includes(pass.id);
+              const isExpanded = expandedId === pass.id;
+              const isLoading = loadingId === pass.id;
+
+              return (
+                <div
+                  key={pass.id}
+                  className={`group bg-white rounded-2xl border transition-all duration-200 shadow-sm hover:shadow-md ${isSelected ? "border-indigo-500 ring-1 ring-indigo-500" : "border-slate-200"
+                    }`}
+                >
+                  <div className="p-4 md:p-5 flex flex-col sm:flex-row items-start gap-4">
+
+                    {/* Checkbox & Index Column */}
+                    <div className="flex items-center gap-3 self-start sm:self-center shrink-0">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleSelectOutpass(pass.id)}
+                        className="w-4 h-4 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500 cursor-pointer"
+                      />
+                      <span className="flex items-center justify-center bg-slate-100 border border-slate-200 text-slate-600 text-xs font-semibold rounded-full h-6 w-6">
+                        {idx + 1}
+                      </span>
+                    </div>
+
+                    {/* Main Content Details */}
+                    <div
+                      onClick={() => SetExpandedId(isExpanded ? null : pass.id)}
+                      className="flex-1 cursor-pointer space-y-1.5"
+                    >
+                      <div className="flex flex-wrap items-baseline gap-x-3">
+                        <h2 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                          {pass.student.name}
+                        </h2>
+                        <span className="text-sm text-slate-500 font-bold">Sec: {pass.student.section}</span>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-600">
+                        <div className="flex items-center gap-1" suppressHydrationWarning>
+                          <span className="text-slate-400 font-medium">From:</span>
+                          <span className="font-semibold text-slate-700">{new Date(pass.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                        </div>
+                        <div className="hidden sm:inline text-slate-300">•</div>
+                        <div className="flex items-center gap-1" suppressHydrationWarning>
+                          <span className="text-slate-400 font-medium">To:</span>
+                          <span className="font-semibold text-slate-700">{new Date(pass.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                        </div>
+                      </div>
+
+                      {/* Reason (Collapsible / Dynamic View) */}
+                      {pass.reason && (
+                        <div className={`mt-2 p-3 bg-slate-50 rounded-xl border border-slate-100 transition-all ${isExpanded ? "" : "line-clamp-1 sm:line-clamp-none text-slate-500"}`}>
+                          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Reason for leave</p>
+                          <p className="text-sm italic text-slate-700">"{pass.reason}"</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Individual Action Action Control Panel */}
+                    <div className="flex sm:flex-col items-center gap-2 w-full sm:w-auto shrink-0 mt-3 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                      <button
+                        type="button"
+                        disabled={isLoading}
+                        onClick={() => handleDecision(pass.id, "APPROVED")}
+                        className="flex-1 sm:flex-none justify-center w-full sm:w-28 px-4 py-2 text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded-xl font-semibold text-xs transition-colors shadow-sm cursor-pointer inline-flex items-center"
+                      >
+                        {isLoading ? "..." : "Approve"}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={isLoading}
+                        onClick={() => setActiveRejectId(pass.id)}
+                        className="flex-1 sm:flex-none justify-center w-full sm:w-28 px-4 py-2 text-rose-600 bg-rose-50 hover:bg-rose-100 disabled:opacity-50 rounded-xl font-semibold text-xs transition-colors cursor-pointer inline-flex items-center"
+                      >
+                        Reject
+                      </button>
+                    </div>
+
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        <RemarksModel
+          isOpen={activeRejectId !== null}
+          value={activeRejectId ? (remarks[activeRejectId] ?? "") : ""}
+          onChange={(newValue) => activeRejectId && setRemarks({ ...remarks, [activeRejectId]: newValue })}
+          onCancel={() => setActiveRejectId(null)}
+          onConfirm={() => activeRejectId && handleDecision(activeRejectId, "REJECTED")} />
+      </div>
+      <RejectionString
+        isOpen={confirmation}
+        value={bulkRejection}
+        onChange={(newValue) => { setBulkRejection(newValue) }}
+        onCancel={() => { setConfirmation(false); setBulkRejection(""); }}
         onConfirm={() => { confirmationCheck(); }} />
 
     </div>

@@ -79,7 +79,7 @@ model User{
   //Parent Linkage
   parentId String?
   parent User? @relation("ParentToStudent",fields:[parentId],references:[id])
-  parent User[] @relation("ParentToStudent")
+  student User[] @relation("ParentToStudent")
 
   
   //Relationships to easily query
