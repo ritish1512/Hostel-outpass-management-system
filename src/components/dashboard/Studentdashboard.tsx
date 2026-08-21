@@ -165,7 +165,7 @@ export default function StudentDashboard({ outpasses, studentId, rejectedLog }: 
 
             {/* Rejection Reason Section */}
             <div className="mb-6 rounded-xl bg-rose-50/40 p-4 border border-rose-100 text-left">
-              <span className="text-xs font-bold uppercase tracking-wider text-rose-700">Reason: </span>
+              <span className="text-xs font-bold uppercase tracking-wider text-rose-600">Reason: </span>
               <p className="mt-1 text-sm font-medium text-gray-700">{rejectReason || "No reason specified by administration."}</p>
             </div>
 
