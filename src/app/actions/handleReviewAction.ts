@@ -4,7 +4,7 @@ import { LeaveStatus, Role, WorkflowTier } from "@/generated/prisma";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 
-const nextTier: Record<WorkflowTier, WorkflowTier> = { 
+const nextTier: Record<WorkflowTier, WorkflowTier> = {
     PARENT_REVIEW: WorkflowTier.MENTOR_REVIEW,
     MENTOR_REVIEW: WorkflowTier.HOD_REVIEW,
     HOD_REVIEW: WorkflowTier.PRINCIPAL_REVIEW,
@@ -19,11 +19,11 @@ const nextTier: Record<WorkflowTier, WorkflowTier> = {
 
 export async function handleReviewAction(
     requestId: string,
-    action: "APPROVED" | "REJECTED", 
+    action: "APPROVED" | "REJECTED",
     remarks?: string
 ) {
     const session = await auth();
-    if(!session){
+    if (!session) {
         throw new Error("please login again");
     }
     const actorId = session.user.id;
@@ -32,7 +32,6 @@ export async function handleReviewAction(
         prisma.user.findUnique({ where: { id: actorId } }),
     ]);
     if (!outPass) {
-        console.log("Error happened in src/app/actions/leave.ts: Outpass not found");
         throw new Error("There is a problem with fetching the outpass");
     }
 
@@ -54,10 +53,10 @@ export async function handleReviewAction(
     };
 
     const requiredRole = tierRoleMap[outPass.tier];
-    if (requiredRole && actor.role !== requiredRole){
+    if (requiredRole && actor.role !== requiredRole) {
         throw new Error(`Unauthorized action: only ${requiredRole.toLowerCase()} can process tier ${outPass.tier}.`);
     }
-    
+
     const dbActionStatus = action === "APPROVED" ? LeaveStatus.APPROVED : LeaveStatus.REJECTED;
 
     if (dbActionStatus === LeaveStatus.REJECTED) {
@@ -78,7 +77,6 @@ export async function handleReviewAction(
 
     const nextTierValue = nextTier[outPass.tier];
     if (!nextTierValue) {
-        console.log("Error happened in src/app/actions/leave.ts: Invalid tier transformation");
         throw new Error("There is a problem with fetching the next tier");
     }
 

@@ -1,6 +1,6 @@
 "use client";
 import { LeaveType } from "@/generated/prisma";
-import { handleReviewAction } from "@/app/actions/leave";
+import { handleReviewAction } from "@/app/actions/handleReviewAction";
 import dashboardProps from "@/types/dashboard";
 import { useState } from "react";
 import { RemarksModel } from "../feature/RemarksModel";

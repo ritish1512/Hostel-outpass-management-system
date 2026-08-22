@@ -2,6 +2,7 @@
 
 import { LeaveType, LeaveRequest, LeaveStatus, WorkflowTier } from "@/generated/prisma";
 import prisma from "@/lib/prisma";
+import { rejectedLog } from "./rejectedLog";
 
 export async function requestLeave(
     studentId: string,
@@ -73,19 +74,5 @@ export async function requestLeave(
     }
 }
 
-export async function rejectedLog(outPassId: string) {
-    return await prisma.workflowLog.findFirst({
-        where: {
-            leaveRequestId: outPassId,
-        },
-        orderBy: {
-            createdAt: "desc"
-        },
-        select: {
-            createdAt: true,
-            remarks: true
-        }
-    });
-}
 
 export default requestLeave;

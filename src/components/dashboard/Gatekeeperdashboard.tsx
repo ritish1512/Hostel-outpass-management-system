@@ -1,6 +1,6 @@
 "use client";
 
-import { handleReviewAction } from "@/app/actions/leave";
+import { handleReviewAction } from "@/app/actions/handleReviewAction";
 import { WorkflowTier } from "@/generated/prisma";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useEffect, useRef, useState } from "react";

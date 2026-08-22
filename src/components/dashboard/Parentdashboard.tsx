@@ -1,5 +1,5 @@
 "use client";
-import { handleReviewAction } from "@/app/actions/leave";
+import { handleReviewAction } from "@/app/actions/handleReviewAction";
 import { useState } from "react";
 import dashboardProps from "@/types/dashboard";
 import { RemarksModel } from "../feature/RemarksModel";

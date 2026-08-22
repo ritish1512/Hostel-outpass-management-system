@@ -10,7 +10,7 @@ import Principaldashboard from "@/components/dashboard/Principaldashboard";
 import Studentdashboard from "@/components/dashboard/Studentdashboard";
 import Wardendashboard from "@/components/dashboard/Wardendashboard";
 import { IOutpass } from "@/types/dashboard";
-import { rejectedLog} from "./actions/leave_request";
+import { rejectedLog} from "./actions/rejectedLog";
 
 export const dynamic = "force-dynamic";
 

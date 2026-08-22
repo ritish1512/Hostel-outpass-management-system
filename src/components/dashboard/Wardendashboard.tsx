@@ -2,7 +2,7 @@
 import { Suspense } from "react";
 import dashboardProps from "@/types/dashboard";
 import { useState } from "react";
-import { handleReviewAction } from "@/app/actions/leave";
+import { handleReviewAction } from "@/app/actions/handleReviewAction";
 import { WentOutStudent } from "../feature/students-out";
 
 export default function Wardendashboard({ outpasses }: dashboardProps) {
