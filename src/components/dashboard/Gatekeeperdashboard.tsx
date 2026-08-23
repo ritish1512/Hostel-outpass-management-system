@@ -10,6 +10,10 @@ export default function GatekeeperDashboard() {
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
   const [isloading, setIsLoading] = useState<boolean>(false);
 
+  const LoadingRef = useRef(isloading);
+  useEffect(()=>{
+    LoadingRef.current = isloading;
+  },[isloading]);
   useEffect(() => {
     scannerRef.current = new Html5QrcodeScanner(
       "scanner",
@@ -21,15 +25,15 @@ export default function GatekeeperDashboard() {
     );
 
     const success = async (result: string) => {
-      if (isloading) return;
+      if (LoadingRef.current) return;
       setIsLoading(true);
       try {
-        if (scannerRef.current) {
-          await scannerRef.current.clear();
-        }
         const scan = await handleReviewAction(result, "APPROVED");
         if (scan[0].tier === WorkflowTier.COMPLETED) alert("Allowed inside.");
         else alert("Approved");
+        if (scannerRef.current) {
+          await scannerRef.current.clear();
+        }
       } catch (err) {
         alert(err instanceof Error ? err.message : String(err));
       } finally {
