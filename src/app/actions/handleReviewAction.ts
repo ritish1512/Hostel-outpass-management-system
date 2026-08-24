@@ -74,8 +74,15 @@ export async function handleReviewAction(
     if (["COMPLETED", "ARCHIEVED_REJECTED", "EXPIRED"].includes(outPass.tier)) {
         throw new Error("This outpass can no longer be processed.");
     }
+    const now = new Date();
+    const startTime = new Date(outPass.startDate).getTime();
+    const LocalStart = startTime - now.getTimezoneOffset();
+    const ExpiryTime = LocalStart + 2*60*60*1000;
 
-    const nextTierValue = nextTier[outPass.tier];
+    let nextTierValue = nextTier[outPass.tier];
+    if(ExpiryTime<now.getTime()){
+        nextTierValue = nextTier[WorkflowTier.EXPIRED];
+    }
     if (!nextTierValue) {
         throw new Error("There is a problem with fetching the next tier");
     }
@@ -92,7 +99,9 @@ export async function handleReviewAction(
         default:
             newStatus = LeaveStatus.PENDING;
     }
-
+    if(ExpiryTime<now.getTime()){
+        newStatus= LeaveStatus.EXPIRED;
+    }
     const baseData: any = {
         status: newStatus,
         tier: nextTierValue,

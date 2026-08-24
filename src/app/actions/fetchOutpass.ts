@@ -6,7 +6,7 @@ import { WorkflowTier, Role, LeaveStatus, Hostel } from "@/generated/prisma";
 export async function fetchOutpass() {
     const session = await auth();
 
-    const currentRole = session?.user?.role?.toUpperCase() as Role;
+    const currentRole = session?.user?.role as Role;
 
 
     if (!session || !session.user?.id || !currentRole) {
