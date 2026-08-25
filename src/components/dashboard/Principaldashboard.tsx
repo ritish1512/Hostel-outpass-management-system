@@ -5,6 +5,8 @@ import dashboardProps from "@/types/dashboard";
 import { useState } from "react";
 import { RemarksModel } from "../feature/RemarksModel";
 import RejectionString from "../feature/BulkRejectionConfirmation";
+import { LucideDoorOpen } from "lucide-react";
+import Link from "next/link";
 
 export default function Principaldashboard({ outpasses, actorName }: dashboardProps) {
   const [outPassIds, setOupassIds] = useState<string[]>([]);
@@ -105,32 +107,17 @@ export default function Principaldashboard({ outpasses, actorName }: dashboardPr
         <div className="text-2xl font-bold text-slate-800 tracking-tight">Welcome {actorName}</div>
 
         {/* DASHBOARD HEADER & BULK CONTROLS */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 pt-12 rounded-2xl border border-slate-200 shadow-sm">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Outpass Applications</h1>
             <p className="text-sm text-slate-500 mt-1">
               Review, approve or reject pending student outpass requests.
             </p>
           </div>
-          {filteredOutpasses.length > 0 && (
-            <button
-              type="button"
-              disabled={bulkLoading}
-              onClick={handleSelectAllVisible}
-              className="px-5 py-2.5 text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold text-sm transition-all shadow-md shadow-emerald-100 flex items-center justify-center gap-2 cursor-pointer"
-            >
-              {bulkLoading ? (
-                "Processing..."
-              ) : (
-                <>
-                  <span className="h-2 w-2 rounded-full bg-emerald-300 animate-pulse" />
-                  {allVisibleSelected ? "Deselect All" : "Select All"} ({filteredOutpasses.length})
-                </>
-              )}
-            </button>
-          )}
+          <Link href="/leave" className="absolute top-2 right-2 p-2 bg-amber-300 rounded-full"><LucideDoorOpen/></Link>
+          
           {(filteredSelectedCount > 0) && (
-            <div className="flex items-center duration-600 justify-evenly w-full">
+            <div className="flex items-center duration-600 gap-4 w-full">
               <span className="text-sm font-medium text-slate-600 bg-slate-100 px-2 py-1 rounded-lg">
                 {filteredSelectedCount} selected
               </span>
@@ -151,6 +138,23 @@ export default function Principaldashboard({ outpasses, actorName }: dashboardPr
                 {bulkLoading ? "Processing..." : "Bulk Reject"}
               </button>
             </div>
+          )}
+          {filteredOutpasses.length > 0 && (
+            <button
+              type="button"
+              disabled={bulkLoading}
+              onClick={handleSelectAllVisible}
+              className="px-5 py-2.5 text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl font-bold text-sm transition-all shadow-md shadow-emerald-100 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              {bulkLoading ? (
+                "Processing..."
+              ) : (
+                <>
+                  <span className="h-2 w-2 rounded-full bg-emerald-300 animate-pulse" />
+                  {allVisibleSelected ? "Deselect All" : "Select All"} ({filteredOutpasses.length})
+                </>
+              )}
+            </button>
           )}
         </div>
 
