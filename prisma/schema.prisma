@@ -43,14 +43,13 @@ enum WorkflowTier{
   WENT_OUT
   COMPLETED
   ARCHIEVED_REJECTED
-  EXPIRED
 }
-
+  
 enum Hostel{
   NBH
   OBH
   NGH
-  OGN
+  OGH
 }
 
 model Department{
@@ -71,6 +70,7 @@ model User{
   department Department? @relation(fields:[departmentId],references:[id])
   section String?
   semester Int?
+  registerNumber Int?
   
   //Hostel details for student and WARDEN
   HostelName Hostel?

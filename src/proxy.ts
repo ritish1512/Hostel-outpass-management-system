@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 export function proxy(req:NextRequest){
     const url = req.nextUrl.clone();
-    url.pathname = '/login'
+    url.pathname = '/login';
     
     return NextResponse.redirect(url);
 }

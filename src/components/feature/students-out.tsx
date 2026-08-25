@@ -29,7 +29,7 @@ export const WentOutStudent = () => {
   // Filter students based on search input
   const filteredStudents = students.filter((student) =>
     student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.HostelRoomNo.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    (student.HostelRoomNo as number).toString().toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (

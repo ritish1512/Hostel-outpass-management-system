@@ -1,13 +1,21 @@
-import { LeaveType } from "@/generated/prisma";
+import { LeaveType, Hostel, Role } from "@/generated/prisma";
 export interface department {
   name: string,
 }
 export interface student {
-  name: string,
-  semester: number,
-  section: string,
-  department: department,
-  HostelRoomNo: number
+  id: string;
+  name: string;
+  email: string;
+  passwordHash: string;
+  role: Role;
+  departmentId: string | null;
+  section: string | null;
+  semester: number | null;
+  HostelName: Hostel | null;
+  HostelRoomNo: number | null;
+  parentId: string | null;
+  createdAt: Date;
+  department: department
 }
 export interface IOutpass {
   id: string;

@@ -14,7 +14,6 @@ const nextTier: Record<WorkflowTier, WorkflowTier> = {
     WENT_OUT: WorkflowTier.COMPLETED,
     COMPLETED: WorkflowTier.COMPLETED,
     ARCHIEVED_REJECTED: WorkflowTier.ARCHIEVED_REJECTED,
-    EXPIRED: WorkflowTier.EXPIRED
 };
 
 export async function handleReviewAction(
@@ -24,7 +23,7 @@ export async function handleReviewAction(
 ) {
     const session = await auth();
     if (!session) {
-        throw new Error("please login again");
+        throw new Error("Session not found");
     }
     const actorId = session.user.id;
     const [outPass, actor] = await Promise.all([
@@ -48,8 +47,7 @@ export async function handleReviewAction(
         GATEKEEPER_REVIEW: Role.GATEKEEPER,
         WENT_OUT: Role.GATEKEEPER,
         COMPLETED: Role.GATEKEEPER,
-        ARCHIEVED_REJECTED: Role.PARENT,
-        EXPIRED: Role.PARENT,
+        ARCHIEVED_REJECTED: Role.PARENT
     };
 
     const requiredRole = tierRoleMap[outPass.tier];
@@ -70,18 +68,18 @@ export async function handleReviewAction(
             })
         ]);
     }
-
-    if (["COMPLETED", "ARCHIEVED_REJECTED", "EXPIRED"].includes(outPass.tier)) {
+    const crntStatus = outPass.status;
+    if (crntStatus === LeaveStatus.COMPLETED || crntStatus === LeaveStatus.REJECTED || crntStatus === LeaveStatus.EXPIRED) {
         throw new Error("This outpass can no longer be processed.");
     }
-    const now = new Date();
-    const startTime = new Date(outPass.startDate).getTime();
-    const LocalStart = startTime - now.getTimezoneOffset();
-    const ExpiryTime = LocalStart + 2*60*60*1000;
-
+    if(crntStatus=== LeaveStatus.PENDING && actor.role===Role.GATEKEEPER){
+        throw new Error("Please get approved first");
+    }
+    const now = Date.now();
+    const endTime = new Date(outPass.endDate).getTime();
     let nextTierValue = nextTier[outPass.tier];
-    if(ExpiryTime<now.getTime()){
-        nextTierValue = nextTier[WorkflowTier.EXPIRED];
+    if(endTime<now && outPass.tier!==WorkflowTier.WENT_OUT){
+        nextTierValue = nextTier[WorkflowTier.ARCHIEVED_REJECTED];
     }
     if (!nextTierValue) {
         throw new Error("There is a problem with fetching the next tier");
@@ -99,10 +97,10 @@ export async function handleReviewAction(
         default:
             newStatus = LeaveStatus.PENDING;
     }
-    if(ExpiryTime<now.getTime()){
+    if(endTime<now && outPass.tier!== WorkflowTier.WENT_OUT){
         newStatus= LeaveStatus.EXPIRED;
     }
-    const baseData: any = {
+    const baseData = {
         status: newStatus,
         tier: nextTierValue,
         outTime: outPass.outTime,

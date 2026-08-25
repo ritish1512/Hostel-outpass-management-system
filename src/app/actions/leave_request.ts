@@ -1,6 +1,6 @@
 "use server";
 
-import { LeaveType, LeaveRequest, LeaveStatus, WorkflowTier } from "@/generated/prisma";
+import { LeaveType, LeaveStatus, WorkflowTier } from "@/generated/prisma";
 import prisma from "@/lib/prisma";
 import { rejectedLog } from "./rejectedLog";
 
@@ -69,8 +69,7 @@ export async function requestLeave(
 
         return leaveRequest;
     } catch (error) {
-        console.error("Critical breakdown inside requestLeave server action:", error);
-        throw new Error("Failed to initialize gate outpass workflow sequence.");
+        throw new Error("Error Occured while fetching the log");
     }
 }
 

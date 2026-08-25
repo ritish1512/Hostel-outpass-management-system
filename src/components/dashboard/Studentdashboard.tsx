@@ -41,7 +41,7 @@ export default function StudentDashboard({ outpasses, studentId, rejectedLog }: 
 
   const latestOutpass = outpasses[0];
   const latestOutpassId = latestOutpass?.id;
-  const isExpired = latestOutpass.status === LeaveStatus.EXPIRED && latestOutpass.tier === WorkflowTier.EXPIRED;
+  const isExpired = latestOutpass.status === LeaveStatus.EXPIRED;
   const onProcess = latestOutpass?.status === LeaveStatus.PENDING && !isExpired;
   const approved = latestOutpass?.status === LeaveStatus.APPROVED && !isExpired;
 
@@ -73,7 +73,6 @@ export default function StudentDashboard({ outpasses, studentId, rejectedLog }: 
     WENT_OUT: "SCAN AGAIN TO GET INSIDE",
     COMPLETED: "COMPLETED",
     ARCHIEVED_REJECTED: "Archived Rejected",
-    EXPIRED: "Expired",
   };
   const completedCustomLabels: Record<WorkflowTier, string> = {
     PARENT_REVIEW: "PARENT APPROVED",
@@ -85,7 +84,6 @@ export default function StudentDashboard({ outpasses, studentId, rejectedLog }: 
     WENT_OUT: "RETURNED",
     COMPLETED: "COMPLETED",
     ARCHIEVED_REJECTED: "Archived Rejected",
-    EXPIRED: "Expired",
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,10 +119,7 @@ export default function StudentDashboard({ outpasses, studentId, rejectedLog }: 
                 );
               })}
             </div>
-            <div className="text-center mt-2 group">
-              <button className="focus:outline-none">Expiry timing: {new Date(latestOutpass.startDate).toLocaleString("en-IN")} </button>
-              <span className="group-focus-within:inline hidden"> (+ 2hrs)</span>
-            </div>
+            <div className="text-center mt-2 group">Expiry timing: {new Date(latestOutpass.endDate).toLocaleString("en-IN")}</div>
           </div>
         </>
       ) : approved ? (
