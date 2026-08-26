@@ -15,6 +15,7 @@ const PoppinsFont = Poppins({
 export const metadata: Metadata = {
   title: "Outpass",
   description: "Campus outpass management sytem",
+  manifest:"/manifest.json"
 };
 
 export default async function RootLayout({
