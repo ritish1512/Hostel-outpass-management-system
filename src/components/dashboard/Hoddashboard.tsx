@@ -6,6 +6,7 @@ import { RemarksModel } from "../feature/RemarksModel";
 import RejectionString from "../feature/BulkRejectionConfirmation";
 import Link from "next/link";
 import { SquareCenterlineDashedVertical } from "lucide-react";
+import { handleBulkReview } from "@/app/actions/handleBulkReview";
 
 export default function Hoddashboard({ outpasses, actorName }: dashboardProps) {
   const [outPassIds, setOupassIds] = useState<string[]>([]);
@@ -54,10 +55,7 @@ export default function Hoddashboard({ outpasses, actorName }: dashboardProps) {
     if (!confirmation) return;
     setBulkLoading(true);
     try {
-      for (const id of outPassIds) {
-        const note = remarks[id] || "Bulk Rejected by HOD";
-        await handleReviewAction(id, action, note);
-      }
+      handleBulkReview(outPassIds,action,`Bulk Decision by ${actorName}`);
       alert(`Bulk execution complete: ${outPassIds.length} requests updated.`);
       window.location.reload();
     } catch (err) {
@@ -221,7 +219,7 @@ export default function Hoddashboard({ outpasses, actorName }: dashboardProps) {
           isOpen={activeRejectId !== null}
           value={activeRejectId ? (remarks[activeRejectId] ?? "") : ""}
           onChange={(newValue) => activeRejectId && setRemarks({ ...remarks, [activeRejectId]: newValue })}
-          onCancel={() => setActiveRejectId(null)}
+          onCancel={() =>{ setActiveRejectId(null),activeRejectId && setRemarks({[activeRejectId]:""})}}
           onConfirm={() => activeRejectId && handleDecision(activeRejectId, "REJECTED")} />
       </div>
       <RejectionString

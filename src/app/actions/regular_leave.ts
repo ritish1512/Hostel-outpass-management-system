@@ -68,14 +68,17 @@ export async function bulkRegisterRegularLeave({ Department, Section, Semester, 
                 type: 'REGULAR' as LeaveType,
                 status: 'APPROVED' as LeaveStatus,
                 tier: 'GATEKEEPER_REVIEW' as WorkflowTier,
-                studentId: id
+                studentId: id,
             }));
 
             // Bulk insert all rows with a single command
             await tx.leaveRequest.createMany({
                 data: leavePayloads
             });
-        });
+        },{
+    maxWait: 5000, // Time to wait for a database connection (Default: 2000)
+    timeout: 20000 // Extended transaction run time limit (Set to 20 seconds)
+  });
 
         return { 
             success: true, 

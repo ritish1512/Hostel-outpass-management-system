@@ -7,6 +7,7 @@ import { RemarksModel } from "../feature/RemarksModel";
 import RejectionString from "../feature/BulkRejectionConfirmation";
 import { LucideDoorOpen } from "lucide-react";
 import Link from "next/link";
+import { handleBulkReview } from "@/app/actions/handleBulkReview";
 
 export default function Principaldashboard({ outpasses, actorName }: dashboardProps) {
   const [outPassIds, setOupassIds] = useState<string[]>([]);
@@ -88,10 +89,7 @@ export default function Principaldashboard({ outpasses, actorName }: dashboardPr
     if (!confirmation) return;
     setBulkLoading(true);
     try {
-      for (const id of outPassIds) {
-        const note = remarks[id] || "Bulk Rejected by HOD";
-        await handleReviewAction(id, action, note);
-      }
+      handleBulkReview(outPassIds,action,`Bulk Decision by ${actorName}`)
       alert(`Bulk execution complete: ${outPassIds.length} requests updated.`);
       window.location.reload();
     } catch (err) {

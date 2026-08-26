@@ -3,6 +3,7 @@ import { handleReviewAction } from "@/app/actions/handleReviewAction";
 import dashboardProps from "@/types/dashboard";
 import { useState } from "react";
 import { RemarksModel } from "../feature/RemarksModel";
+import { handleBulkReview } from "@/app/actions/handleBulkReview";
 
 export default function Mentordashboard({ outpasses, actorName }: dashboardProps) {
   const [outPassIds, setOupassIds] = useState<string[]>([]);
@@ -41,10 +42,7 @@ export default function Mentordashboard({ outpasses, actorName }: dashboardProps
     if (!confirmation) return;
     setBulkLoading(true);
     try {
-      for (const id of outPassIds) {
-        const note = remarks[id] || "";
-        await handleReviewAction(id, action, note);
-      }
+      handleBulkReview(outPassIds,action,"");
       alert(`Bulk execution complete: ${outPassIds.length} requests updated.`);
       window.location.reload();
     } catch (err) {

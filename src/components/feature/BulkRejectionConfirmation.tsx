@@ -26,14 +26,14 @@ export default function RejectionString({ isOpen, value, onChange, onCancel, onC
         <div className="mt-5 flex justify-center gap-3">
           <button
             type="button"
-            onClick={() => onCancel}
+            onClick={() => onCancel()}
             className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors"
           >
             Cancel
           </button>
           <button
             type="button"
-            onClick={() => onConfirm}
+            onClick={() => onConfirm()}
             className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 active:bg-red-800 transition-colors shadow-sm"
           >
             Reject

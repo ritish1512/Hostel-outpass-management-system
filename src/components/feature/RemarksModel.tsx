@@ -40,9 +40,9 @@ export const RemarksModel = ({ isOpen, value, onChange, onCancel, onConfirm }: r
             disabled={!value.trim()}
             onClick={(e) => {
               e.preventDefault();
-              onConfirm;
+              onConfirm();
             }}
-            className="px-4 py-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium rounded-xl text-sm transition-all shadow-sm"
+            className="px-4 py-2 cursor-pointer bg-rose-600 hover:bg-rose-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium rounded-xl text-sm transition-all shadow-sm"
           >
             Confirm Rejection
           </button>
