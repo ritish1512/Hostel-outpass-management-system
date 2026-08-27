@@ -4,6 +4,7 @@ import { wildcard } from "@/app/actions/wildcard";
 import { LeaveStatus, LeaveType } from "@/generated/prisma";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useEffect, useState, useRef } from "react";
+import { formatDateTimeLocalInIST } from "@/lib/dateTime";
 
 export const Wildcard = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -49,21 +50,12 @@ export const Wildcard = () => {
             return;
         }
 
-        // Format for datetime-local
-        const formatLocalTime = (dateInput: any) => {
-          if (!dateInput) return "";
-          const dateObj = new Date(dateInput);
-          if (isNaN(dateObj.getTime())) return "";
-          const offsetMs = dateObj.getTimezoneOffset() * 60 * 1000;
-          const localDate = new Date(dateObj.getTime() - offsetMs);
-          return localDate.toISOString().slice(0, 16);
-        };
         //the main purpose of this
         setPassId(leave.id);
         setSdntName(sdnt.name || "");
         setReason(leave.reason || "");
-        setFromDate(formatLocalTime(leave.startDate));
-        setToDate(formatLocalTime(leave.endDate));
+        setFromDate(formatDateTimeLocalInIST(leave.startDate));
+        setToDate(formatDateTimeLocalInIST(leave.endDate));
         setLType(leave.type as LeaveType);
         //clear component
         await scanner.clear();

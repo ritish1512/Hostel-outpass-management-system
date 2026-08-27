@@ -3,6 +3,7 @@
 
 import prisma from "@/lib/prisma";
 import { LeaveStatus, LeaveType, Role, WorkflowTier } from "@/generated/prisma";
+import { parseDateTimeLocalAsIST } from "@/lib/dateTime";
 
 interface IRegularLeaveParamType {
     startDate: string;
@@ -16,11 +17,8 @@ export async function bulkRegisterRegularLeave({ Department, Section, Semester, 
     try {
 
         // 1. Validate dates globally upfront
-        const fromDate = new Date(startDate);
-        const toDate = new Date(endDate);
-        if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
-            return { success: false, message: "Invalid date format provided." };
-        }
+        const fromDate = parseDateTimeLocalAsIST(startDate);
+        const toDate = parseDateTimeLocalAsIST(endDate);
         if (fromDate > toDate) {
             return { success: false, message: "Start date cannot be after end date." };
         }

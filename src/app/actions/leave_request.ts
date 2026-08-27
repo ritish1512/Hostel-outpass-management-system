@@ -2,6 +2,7 @@
 
 import { LeaveType, LeaveStatus, WorkflowTier } from "@/generated/prisma";
 import prisma from "@/lib/prisma";
+import { parseDateTimeLocalAsIST } from "@/lib/dateTime";
 import { rejectedLog } from "./rejectedLog";
 
 export async function requestLeave(
@@ -11,17 +12,17 @@ export async function requestLeave(
     reason: string,
     type: LeaveType = LeaveType.OUTING
 ) {
-    const fromDate = new Date(fromDateString).valueOf();
-    const toDate = new Date(toDateString).valueOf();
+    const fromDateValue = parseDateTimeLocalAsIST(fromDateString).valueOf();
+    const toDateValue = parseDateTimeLocalAsIST(toDateString).valueOf();
     const now = new Date().valueOf();
     
-    if (isNaN(fromDate) || isNaN(toDate)) {
+    if (isNaN(fromDateValue) || isNaN(toDateValue)) {
         throw new Error("Invalid date format provided.");
     }
 
-    if (fromDate < now)
+    if (fromDateValue < now)
         throw new Error("Cannot apply for an outpass for a time in the past");
-    if (fromDate > toDate)
+    if (fromDateValue > toDateValue)
         throw new Error("You can't come before you go");
 
     const latestOutpass = await prisma.leaveRequest.findFirst({
@@ -58,8 +59,8 @@ export async function requestLeave(
         const leaveRequest = await prisma.leaveRequest.create({
             data: {
                 reason,
-                startDate: new Date(fromDateString), 
-                endDate: new Date(toDateString),
+                startDate: new Date(fromDateValue),
+                endDate: new Date(toDateValue),
                 type,
                 studentId,
                 status: LeaveStatus.PENDING,

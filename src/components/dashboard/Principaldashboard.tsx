@@ -253,12 +253,12 @@ export default function Principaldashboard({ outpasses, actorName }: dashboardPr
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-600">
                         <div className="flex items-center gap-1" suppressHydrationWarning>
                           <span className="text-slate-400 font-medium">From:</span>
-                          <span className="font-semibold text-slate-700">{new Date(pass.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                          <span className="font-semibold text-slate-700">{new Date(pass.startDate).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' })}</span>
                         </div>
                         <div className="hidden sm:inline text-slate-300">•</div>
                         <div className="flex items-center gap-1" suppressHydrationWarning>
                           <span className="text-slate-400 font-medium">To:</span>
-                          <span className="font-semibold text-slate-700">{new Date(pass.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                          <span className="font-semibold text-slate-700">{new Date(pass.endDate).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' })}</span>
                         </div>
                       </div>
 

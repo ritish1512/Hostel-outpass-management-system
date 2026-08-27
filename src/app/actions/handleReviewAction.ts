@@ -56,6 +56,13 @@ export async function handleReviewAction(
     }
 
     const dbActionStatus = action === "APPROVED" ? LeaveStatus.APPROVED : LeaveStatus.REJECTED;
+    const crntStatus = outPass.status;
+    if (crntStatus === LeaveStatus.COMPLETED || crntStatus === LeaveStatus.REJECTED || crntStatus === LeaveStatus.EXPIRED) {
+        throw new Error("This outpass can no longer be processed.");
+    }
+    if (new Date(outPass.endDate).getTime() < Date.now() && outPass.tier !== WorkflowTier.WENT_OUT) {
+        throw new Error("This outpass has expired and can no longer be processed.");
+    }
 
     if (dbActionStatus === LeaveStatus.REJECTED) {
         return await prisma.$transaction([
@@ -67,10 +74,6 @@ export async function handleReviewAction(
                 data: { leaveRequestId: requestId, actorId, action: dbActionStatus, remarks }
             })
         ]);
-    }
-    const crntStatus = outPass.status;
-    if (crntStatus === LeaveStatus.COMPLETED || crntStatus === LeaveStatus.REJECTED || crntStatus === LeaveStatus.EXPIRED) {
-        throw new Error("This outpass can no longer be processed.");
     }
     if(crntStatus=== LeaveStatus.PENDING && actor.role===Role.GATEKEEPER){
         throw new Error("Please get approved first");

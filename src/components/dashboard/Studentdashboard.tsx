@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import requestLeave from "@/app/actions/leave_request";
 import { LeaveStatus, LeaveType, WorkflowTier } from "@/generated/prisma";
+import { formatDateTimeInIST } from "@/lib/dateTime";
 
 export interface outpass {
   id: string;
@@ -119,7 +120,7 @@ export default function StudentDashboard({ outpasses, studentId, rejectedLog }: 
                 );
               })}
             </div>
-            <div className="text-center mt-2 group">Expiry timing: {new Date(latestOutpass.endDate).toLocaleString("en-IN")}</div>
+            <div className="text-center mt-2 group">Expiry timing: {formatDateTimeInIST(latestOutpass.endDate)}</div>
           </div>
         </>
       ) : approved ? (
