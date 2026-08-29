@@ -25,7 +25,7 @@ interface rejectedLog {
 interface StudentDashboardProps {
   outpasses: outpass[];
   studentId: string;
-  rejectedLog: rejectedLog;
+  rejectedLog: rejectedLog|null;
 }
 
 export default function StudentDashboard({ outpasses, studentId, rejectedLog }: StudentDashboardProps) {
@@ -42,7 +42,7 @@ export default function StudentDashboard({ outpasses, studentId, rejectedLog }: 
 
   const latestOutpass = outpasses[0];
   const latestOutpassId = latestOutpass?.id;
-  const isExpired = latestOutpass.status === LeaveStatus.EXPIRED;
+  const isExpired = latestOutpass?.status === LeaveStatus.EXPIRED;
   const onProcess = latestOutpass?.status === LeaveStatus.PENDING && !isExpired;
   const approved = latestOutpass?.status === LeaveStatus.APPROVED && !isExpired;
 

@@ -22,7 +22,9 @@ export default async function Home() {
   }
   const actorname = await prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true } });
   const outpasses = (await fetchOutpass()) as IOutpass[];
-  const  rejectedlogs =(await rejectedLog(outpasses[0]?.id) as {createdAt: Date;remarks: string | null;})
+  const rejectedlogs = outpasses.length > 0 
+    ? await rejectedLog(outpasses[0].id) as { createdAt: Date; remarks: string | null; }
+    : null;
   const role = String(session.user.role);
 
 
