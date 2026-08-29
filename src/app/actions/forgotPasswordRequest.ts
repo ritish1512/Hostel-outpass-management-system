@@ -1,13 +1,13 @@
+'use server';
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
-import { success } from "zod";
 
 
 export default async function CreateForgetPassword(email:string,password:string){
     const user = await prisma.user.findUnique({where:{email}});
     if(!user){
-        return {error:"User not found"};
+        throw new Error("User not found")
     }
 
     const passwordHash =await bcrypt.hash(password,10);
@@ -38,7 +38,6 @@ export default async function CreateForgetPassword(email:string,password:string)
             message:"Request submitted"
         })
     } catch (error) {
-        return {error:"something went wrong"}
+        throw new Error("Server failure")
     }
-
 }
