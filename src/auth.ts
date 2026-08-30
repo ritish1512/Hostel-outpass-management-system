@@ -1,6 +1,6 @@
 import NextAuth,{DefaultSession} from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import {loginValidation} from "./validations/login";
+import {authSchema} from "./validations/login";
 import bcrypt from "bcryptjs";
 import {UserRole} from "./types/user-role";
 
@@ -30,7 +30,7 @@ export const {handlers,auth,signIn,signOut}= NextAuth({
             password:{label:"Password",type:"password"}
         },
         async authorize(credentials) {
-            const parsed = loginValidation.safeParse(credentials);
+            const parsed = authSchema.safeParse(credentials);
             if(!parsed.success)return null;
             const {email,password} = parsed.data;
 

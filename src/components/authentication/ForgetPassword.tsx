@@ -9,11 +9,12 @@ export default function ForgetPassword(){
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmission = async (e: React.FormEvent) => { 
+  const handleSubmission = async (e: React.FormEvent<HTMLFormElement>) => { 
     e.preventDefault();
     setLoading(true); 
     try {
       await CreateForgetPassword(email, password);
+      alert("Requested successfully;")
     } catch (error) { 
       alert("An unexpected error occurred"); 
     } finally {

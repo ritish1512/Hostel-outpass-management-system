@@ -13,7 +13,7 @@ export default async function PasswordReset(token: string, action: "Approved" | 
                 passwordStatus: 'PENDING'
             },
             include: {
-                user: {
+                user: {  //included user to use it in updating his/her record
                     select: {
                         id: true,
                         email: true,

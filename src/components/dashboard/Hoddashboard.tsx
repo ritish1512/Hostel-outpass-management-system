@@ -68,7 +68,7 @@ export default function Hoddashboard({ outpasses, actorName }: dashboardProps) {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
-        <div className="text-2xl font-bold text-slate-800 tracking-tight">Welcome {actorName}</div>
+        <div className="text-2xl font-bold text-slate-800 tracking-tightl">Welcome {actorName}</div>
 
         {/* DASHBOARD HEADER & BULK CONTROLS */}
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 pt-12 rounded-2xl border border-slate-200 shadow-sm">
