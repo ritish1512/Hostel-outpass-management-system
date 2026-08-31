@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { authSchema } from "@/validations/login";
 import bcrypt from "bcryptjs";
 import { auth } from "@/auth";
+import { parseDateTimeLocalAsIST } from "@/lib/dateTime";
 
 
 export default async function CreateForgetPassword(email: string, password: string) {
@@ -24,6 +25,7 @@ export default async function CreateForgetPassword(email: string, password: stri
     const activeToken = crypto.randomUUID().toString();
     const expireAt = new Date();
     expireAt.setHours(expireAt.getHours() + 4);
+    const expireAtUTC=(parseDateTimeLocalAsIST(expireAt.toString()))
 
     await prisma.passwordChange.updateMany({
         where: {
@@ -40,7 +42,7 @@ export default async function CreateForgetPassword(email: string, password: stri
                 userId: user.id,
                 newPasswordHash: passwordHash,
                 activeToken,
-                expiryTime: expireAt
+                expiryTime: expireAtUTC
             }
         })
         return {

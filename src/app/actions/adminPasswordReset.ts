@@ -1,3 +1,4 @@
+"use server";
 import { auth } from "@/auth";
 import { LeaveStatus } from "@/generated/prisma";
 import prisma from "@/lib/prisma";

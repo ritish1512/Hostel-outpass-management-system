@@ -15,6 +15,7 @@ enum Role{
   WARDEN
   PRINCIPAL
   GATEKEEPER
+  ADMIN
 }
 
 enum LeaveType{

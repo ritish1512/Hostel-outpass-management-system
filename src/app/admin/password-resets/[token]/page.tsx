@@ -20,7 +20,7 @@ export default async function PasswordResetAdminPage({ params }: PageProps) {
 
   // 2. Fetch the request details to show contextual information in the UI
   const request = await prisma.passwordChange.findFirst({
-    where: { 
+    where: {
       activeToken: token,
     },
     include: {
@@ -29,7 +29,6 @@ export default async function PasswordResetAdminPage({ params }: PageProps) {
           id: true,
           name: true,
           email: true,
-          image: true,
         }
       }
     }
@@ -68,7 +67,6 @@ export default async function PasswordResetAdminPage({ params }: PageProps) {
             user={{
               name: request.user.name || "Unknown User",
               email: request.user.email,
-              image: request.user.image
             }}
           />
         </div>
