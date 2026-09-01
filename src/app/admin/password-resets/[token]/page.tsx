@@ -40,7 +40,7 @@ export default async function PasswordResetAdminPage({ params }: PageProps) {
   }
 
   // 3. Evaluate client-side display states
-  const isExpired = new Date() > request.expiryTime;
+  const isExpired = new Date() > new Date(request.expiryTime.getTime() + (5.5*60*60*1000));
   const isPending = request.passwordStatus === 'PENDING';
 
   return (
@@ -60,7 +60,7 @@ export default async function PasswordResetAdminPage({ params }: PageProps) {
             request={{
               id: request.id,
               status: request.passwordStatus,
-              expiryTime: request.expiryTime.toISOString(),
+              expiryTime: request.expiryTime.toLocaleString("en-IN"),
               isExpired,
               isPending
             }}

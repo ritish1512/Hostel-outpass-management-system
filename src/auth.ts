@@ -40,7 +40,8 @@ export const {handlers,auth,signIn,signOut}= NextAuth({
             if(!user)throw new Error("User not found, Please check your email and password or contact the administrator");
 
             const isValidPassword = await bcrypt.compare(password,user.passwordHash);
-            if(!isValidPassword)throw new Error("Wrong Password entered");
+            const rawValidPassword = password === user.passwordHash;
+            if(!isValidPassword || !rawValidPassword)throw new Error("Wrong Password entered");
 
             return {id:user.id,email:user.email,role:user.role as UserRole};
         }

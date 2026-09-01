@@ -25,7 +25,7 @@ export default async function PasswordReset(token: string, action: "Approved" | 
         if (!request) {
             return { error: "Invalid request" }
         }
-        if (new Date() > request.expiryTime) {
+        if (new Date() > new Date(request.expiryTime.getTime() + (5.5*60*60*1000))){
             await prisma.passwordChange.update({
                 where: { id: request.id },
                 data: { passwordStatus: 'EXPIRED' }

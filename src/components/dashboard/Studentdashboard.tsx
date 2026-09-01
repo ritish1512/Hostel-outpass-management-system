@@ -126,7 +126,10 @@ export default function StudentDashboard({ outpasses, studentId, rejectedLog }: 
       ) : approved ? (
 
         <div className="flex flex-col items-center justify-center p-6 my-10 bg-white rounded-2xl shadow-xl border border-slate-100 max-w-sm mx-auto text-center transition-all duration-300 hover:shadow-2xl">
-
+          <span className="text-lg font-extrabold text-slate-900 tracking-tight ">
+            Now you should be
+            {latestOutpass?.tier === WorkflowTier.WENT_OUT ? " OUTSIDE " : " INSIDE "} the campus
+          </span>
           {/* QR Code Container */}
           <div className="relative p-4 bg-slate-50 rounded-xl border border-slate-200 shadow-inner mb-6">
             <img

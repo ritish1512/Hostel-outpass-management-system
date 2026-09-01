@@ -3,6 +3,7 @@ import { signIn, getSession } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserRole } from "@/types/user-role";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -75,7 +76,7 @@ export default function LoginPage() {
                 type={showPassword ? "text" : "password"}
                 id="password"
                 value={password}
-                onChange={(e) => { setShowPassword(false); setPassword(e.target.value) }}
+                onChange={(e) => { setPassword(e.target.value) }}
                 className="w-full px-3 py-2 mt-1 border rounded focus:outline-none focus:ring focus:border-blue-300 text-black pr-12"
                 required
                 suppressHydrationWarning
@@ -89,12 +90,16 @@ export default function LoginPage() {
                 {showPassword ? "Hide" : "Show"}
               </button>
             </div>
+            <div className="w-full flex justify-between mt-2">
+          <span className="tracking-tight text-rose-600 text-sm">* (A-B),(a-b),(0-9),(spl char),(min 8)</span>
+          <Link href="/forget-password" className="mr-2 text-sm underline text-rose-600"> Forget Password</Link>
           </div>
-
+          </div>
+          
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-4 py-2 font-bold text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring focus:border-blue-300 disabled:opacity-70"
+            className="w-full px-4 py-2 cursor-pointer font-bold text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring focus:border-blue-300 disabled:opacity-70"
             suppressHydrationWarning
           >
             {loading ? "Logging in..." : "Login"}

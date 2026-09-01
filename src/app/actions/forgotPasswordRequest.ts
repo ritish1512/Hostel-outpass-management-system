@@ -5,7 +5,6 @@ import bcrypt from "bcryptjs";
 import { auth } from "@/auth";
 import { parseDateTimeLocalAsIST } from "@/lib/dateTime";
 
-
 export default async function CreateForgetPassword(email: string, password: string) {
     const session = await auth();
 
@@ -17,15 +16,12 @@ export default async function CreateForgetPassword(email: string, password: stri
     if (!user) {
         throw new Error("User not found")
     }
-    if(session?.user.email !== data.data.email){
-        throw new Error("Illegal acitvity detected");
-    }
 
     const passwordHash = await bcrypt.hash(data.data.password, 10);
     const activeToken = crypto.randomUUID().toString();
     const expireAt = new Date();
     expireAt.setHours(expireAt.getHours() + 4);
-    const expireAtUTC=(parseDateTimeLocalAsIST(expireAt.toString()))
+    const expireAtUTC=(parseDateTimeLocalAsIST(expireAt.toISOString().slice(0,16)))
 
     await prisma.passwordChange.updateMany({
         where: {
@@ -39,7 +35,7 @@ export default async function CreateForgetPassword(email: string, password: stri
     try {
         await prisma.passwordChange.create({
             data: {
-                userId: user.id,
+                userId: user?.id,
                 newPasswordHash: passwordHash,
                 activeToken,
                 expiryTime: expireAtUTC
