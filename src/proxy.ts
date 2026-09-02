@@ -5,7 +5,7 @@ import { getToken } from "next-auth/jwt";
 export async function proxy(req: NextRequest) {
   const url = req.nextUrl.clone();
   
-  const token = await getToken({ req,secret:process.env.NEXTAUTH_SECRET });
+  const token = await getToken({ req,secret:process.env.NEXTAUTH_SECRET,secureCookie: process.env.NODE_ENV === "production", });
 
   if (!token) {
     url.pathname = "/";
