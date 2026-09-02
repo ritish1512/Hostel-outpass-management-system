@@ -41,7 +41,7 @@ export const {handlers,auth,signIn,signOut}= NextAuth({
 
             const isValidPassword = await bcrypt.compare(password,user.passwordHash);
             const rawValidPassword = password === user.passwordHash;
-            if(!isValidPassword || !rawValidPassword)throw new Error("Wrong Password entered");
+            if(!isValidPassword && !rawValidPassword)throw new Error("Wrong Password entered");
 
             return {id:user.id,email:user.email,role:user.role as UserRole};
         }
