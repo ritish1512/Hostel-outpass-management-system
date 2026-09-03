@@ -20,18 +20,30 @@ export default async function CreateForgetPassword(email: string, password: stri
     const passwordHash = await bcrypt.hash(data.data.password, 10);
     const activeToken = crypto.randomUUID().toString();
     const expireAt = new Date();
-    expireAt.setHours(expireAt.getHours() + 4);
-    const expireAtUTC=(parseDateTimeLocalAsIST(expireAt.toISOString().slice(0,16)))
+    expireAt.setHours(expireAt.getHours() + 24);
+    const expireAtUTC = (parseDateTimeLocalAsIST(expireAt.toISOString().slice(0, 16)))
 
-    await prisma.passwordChange.updateMany({
+    const recentRequest = await prisma.passwordChange.findFirst({
         where: {
-            userId: user.id,
+            userId: user?.id,
             passwordStatus: 'PENDING'
-        },
-        data: {
-            passwordStatus: 'EXPIRED'
+        }, orderBy: {
+            createdAt: 'desc'
         }
-    })
+    });
+    if (recentRequest?.expiryTime && (recentRequest?.expiryTime.getTime() + 5.5 * 60 * 60 * 1000 < Date.now())) {
+        await prisma.passwordChange.update({
+            where: {
+                id:recentRequest.id,
+            },
+            data: {
+                passwordStatus: 'EXPIRED',
+            }
+        }).catch(() => {
+            throw new Error("Server failure");
+        });
+        throw new Error("You should wait for the previous one to be processed");
+    }
     try {
         await prisma.passwordChange.create({
             data: {
