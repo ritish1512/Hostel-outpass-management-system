@@ -44,6 +44,18 @@ export default async function CreateForgetPassword(email: string, password: stri
         });
         throw new Error("You should wait for the previous one to be processed");
     }
+    if (recentRequest?.expiryTime && (recentRequest?.expiryTime.getTime() + 5.5 * 60 * 60 * 1000 < Date.now())) {
+        await prisma.passwordChange.update({
+            where: {
+                id:recentRequest.id,
+            },
+            data: {
+                passwordStatus: 'EXPIRED',
+            }
+        }).catch(() => {
+            throw new Error("Server failure");
+        });
+    }
     try {
         await prisma.passwordChange.create({
             data: {
