@@ -31,7 +31,7 @@ export default async function CreateForgetPassword(email: string, password: stri
             createdAt: 'desc'
         }
     });
-    if (recentRequest?.expiryTime && (recentRequest?.expiryTime.getTime() + 5.5 * 60 * 60 * 1000 < Date.now())) {
+    if (recentRequest?.expiryTime && (recentRequest?.expiryTime.getTime() + 5.5 * 60 * 60 * 1000 > Date.now())) {
         await prisma.passwordChange.update({
             where: {
                 id:recentRequest.id,
