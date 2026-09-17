@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import requestLeave from "@/app/actions/leave_request";
+import { requestLeave } from "@/app/actions/leave_request";
 import { LeaveStatus, LeaveType, WorkflowTier } from "@/generated/prisma";
 import { formatDateTimeInIST } from "@/lib/dateTime";
 
@@ -17,6 +17,7 @@ export interface outpass {
   createdAt: Date | string;
   outTime?: Date | string | null;
   inTime?: Date | string | null;
+  visualMatchCode: number;
 }
 interface rejectedLog {
   createdAt: Date;
@@ -86,21 +87,34 @@ export default function StudentDashboard({ outpasses, studentId, rejectedLog }: 
     COMPLETED: "COMPLETED",
     ARCHIEVED_REJECTED: "Archived Rejected",
   };
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!reason || !fromDateString || !toDateString) return alert("Please supply all necessary outpass metrics.");
+  // 💡 Locate your submission trigger block and update it like this:
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!reason || !fromDateString || !toDateString) return alert("Please supply all metrics.");
 
-    setLoading(true);
-    try {
-      await requestLeave(studentId, fromDateString, toDateString, reason, type);
-      alert("Outpass request successfully created and routed to tracking nodes!");
-      window.location.reload();
-    } catch (err) {
-      alert(err);
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  try {
+    const response = await requestLeave(studentId, fromDateString, toDateString, reason, type);
+    
+    if (response?.success) {
+      // 💡 Alert the student with their dynamic knowledge tokens immediately!
+      alert(`Outpass Routed! Please tell your parents your code is: ${response.visualMatchCode}`);
+      
+      // OPTIONAL: Copy link to clipboard automatically so they can WhatsApp it
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(response.magicUrl);
+        alert("Parent magic approval link copied to your clipboard automatically!");
+      }
     }
-  };
+    
+    window.location.reload();
+  } catch (err: any) {
+    alert(err?.message || err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div>
@@ -122,6 +136,17 @@ export default function StudentDashboard({ outpasses, studentId, rejectedLog }: 
             </div>
             <div className="text-center mt-2 group">Expiry timing: {formatDateTimeInIST(latestOutpass.endDate)}</div>
           </div>
+          {/* 💡 Drop this alert box into your student view right inside your pending outpass dashboard view */}
+{onProcess && latestOutpass?.tier === "PARENT_REVIEW" && latestOutpass?.visualMatchCode && (
+  <div className="mt-6 p-6 bg-amber-50 border-2 border-dashed border-amber-300 rounded-2xl text-center max-w-md mx-auto space-y-2 animate-pulse">
+    <h3 className="font-bold text-slate-800 text-sm tracking-wide uppercase">Parent Approval Lock Active</h3>
+    <p className="text-xs text-slate-500 font-medium">Call your parents and ask them to choose this number on their dashboard link:</p>
+    <div className="text-4xl font-black text-amber-700 tracking-widest bg-white py-3 px-6 rounded-xl border border-amber-200 inline-block shadow-inner">
+      {latestOutpass.visualMatchCode}
+    </div>
+  </div>
+)}
+
         </>
       ) : approved ? (
 
@@ -211,38 +236,100 @@ export default function StudentDashboard({ outpasses, studentId, rejectedLog }: 
               </div>
             </>
           )}
-          <div className="flex flex-col gap-2 max-w-[90%] md:w-max mx-auto mt-4 p-4 bg-slate-100 border-slate-400 shadow shadow-slate-200 ring-2 ring-slate-300  text-gray-800 rounded-md">
-            <h2 className="text-gray-950 font-bold text-tracking-tight">Apply for Outpass</h2>
-            <form className="flex flex-col gap-5 p-2 relative" onSubmit={handleSubmit}>
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="fromDateString" className="py-1 px-2 bg-slate-300 border-slate-400 shadow-slate-200 ring-2 ring-slate-300 text-gray-800 rounded-md">From Date:</label>
-                  <input type="datetime-local" id="fromDateString" value={fromDateString} onChange={(e) => setfromDateString(e.target.value)} className="p-2 outline-none border border-slate-400 shadow-slate-200 ring-2 ring-slate-300 text-gray-800 rounded-md" suppressHydrationWarning />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="toDateString" className="py-1 px-2  bg-slate-300 border-slate-400 shadow-slate-200 ring-2 ring-slate-300 text-gray-800 rounded-md">To Date:</label>
-                  <input type="datetime-local" id="toDateString" value={toDateString} onChange={(e) => settoDateString(e.target.value)} className="p-2 outline-none border border-slate-400 shadow-slate-200 ring-2 ring-slate-300 text-gray-800 rounded-md" suppressHydrationWarning />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="type" className="py-1 px-2 bg-slate-300 border-slate-400 shadow-slate-200 ring-2 ring-slate-300 text-gray-800 rounded-md">Type:</label>
-                  <select id="type" value={type} onChange={(e) => setType(e.target.value as LeaveType)} className="p-2 outline-none border border-slate-400 shadow-slate-200 ring-2 ring-slate-300 text-gray-800 rounded-md" suppressHydrationWarning>
-                    <option value={LeaveType.OUTING}>Outing</option>
-                    <option value={LeaveType.EMERGENCY}>Emergency</option>
-                    <option value={LeaveType.FUNCTION}>Function</option>
-                    <option value={LeaveType.PERSONAL_WORK}>Personal Work</option>
-                  </select>
-                </div>
-              </div>
-              <div className="flex flex-col gap-2 md:w-[80%]">
-                <label htmlFor="reason" className="py-1 px-2 bg-slate-300 border-slate-400 shadow-slate-200 ring-2 ring-slate-300 text-gray-800 rounded-md">Reason:</label>
-                <input type="text" maxLength={50} id="reason" value={reason} onChange={(e) => setReason(e.target.value)} className="p-2 outline-none border border-slate-400 shadow-slate-200 ring-2 ring-slate-300 text-gray-800 rounded-md" suppressHydrationWarning />
-              </div>
-              <button type='submit' disabled={loading} className="md:absolute right-2 bottom-2 disabled:opacity-80 disabled:cursor-not-allowed bg-green-400 py-1 px-2 md:py-2 md:px-4 border border-green-500 shadow-green-500 rounded-lg md:w-max font-bold text-xl md:text-2xl" suppressHydrationWarning>
-                Apply
-              </button>
-            </form>
-          </div>
-        </div>)}
+          <div className="w-full max-w-2xl mx-auto mt-6 p-6 bg-white border border-slate-200 shadow-sm rounded-xl text-slate-800">
+  <h2 className="text-xl font-bold text-slate-900 tracking-tight mb-5">
+    Apply for Outpass
+  </h2>
+  
+  <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+    {/* Form Inputs Grid */}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="fromDateString" className="text-sm font-medium text-slate-700">
+          From Date
+        </label>
+        <input 
+          type="datetime-local" 
+          id="fromDateString" 
+          value={fromDateString} 
+          onChange={(e) => setfromDateString(e.target.value)} 
+          className="p-2.5 outline-none border border-slate-300 rounded-lg text-sm bg-slate-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all text-slate-800" 
+          suppressHydrationWarning 
+        />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="toDateString" className="text-sm font-medium text-slate-700">
+          To Date
+        </label>
+        <input 
+          type="datetime-local" 
+          id="toDateString" 
+          value={toDateString} 
+          onChange={(e) => settoDateString(e.target.value)} 
+          className="p-2.5 outline-none border border-slate-300 rounded-lg text-sm bg-slate-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all text-slate-800" 
+          suppressHydrationWarning 
+        />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="type" className="text-sm font-medium text-slate-700">
+          Type
+        </label>
+        <select 
+          id="type" 
+          value={type} 
+          onChange={(e) => setType(e.target.value as LeaveType)} 
+          className="p-2.5 outline-none border border-slate-300 rounded-lg text-sm bg-slate-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all text-slate-800" 
+          suppressHydrationWarning
+        >
+          <option value={LeaveType.OUTING}>Outing</option>
+          <option value={LeaveType.EMERGENCY}>Emergency</option>
+          <option value={LeaveType.FUNCTION}>Function</option>
+          <option value={LeaveType.PERSONAL_WORK}>Personal Work</option>
+        </select>
+      </div>
     </div>
+
+    {/* Reason Input */}
+    <div className="flex flex-col gap-1.5">
+      <div className="flex justify-between items-center">
+        <label htmlFor="reason" className="text-sm font-medium text-slate-700">
+          Reason
+        </label>
+        <span className="text-xs text-slate-400">
+          {reason.length}/50
+        </span>
+      </div>
+      <input 
+        type="text" 
+        maxLength={50} 
+        id="reason" 
+        value={reason} 
+        onChange={(e) => setReason(e.target.value)} 
+        placeholder="Briefly describe your reason..."
+        className="p-2.5 outline-none border border-slate-300 rounded-lg text-sm bg-slate-50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all text-slate-800 placeholder:text-slate-400" 
+        suppressHydrationWarning 
+      />
+    </div>
+
+    {/* Form Actions */}
+    <div className="flex justify-end pt-2">
+      <button 
+        type="submit" 
+        disabled={loading} 
+        className="w-full md:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-lg transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed" 
+        suppressHydrationWarning
+      >
+        {loading ? 'Applying...' : 'Apply for Outpass'}
+      </button>
+    </div>
+  </form>
+</div>
+
+        </div>)}
+        
+    </div>
+    
   );
 }

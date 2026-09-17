@@ -108,6 +108,9 @@ model LeaveRequest{
   studentId String
   student User @relation(fields:[studentId],references:[id])
 
+  parentSecretToken  String?       @unique 
+  visualMatchCode    Int?    
+
   logs WorkflowLog[]
 
   createdAt DateTime @default(now())

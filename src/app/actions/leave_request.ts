@@ -4,6 +4,7 @@ import { LeaveType, LeaveStatus, WorkflowTier } from "@/generated/prisma";
 import prisma from "@/lib/prisma";
 import { parseDateTimeLocalAsIST } from "@/lib/dateTime";
 import { rejectedLog } from "./rejectedLog";
+import crypto from "crypto";
 
 export async function requestLeave(
     studentId: string,
@@ -31,11 +32,9 @@ export async function requestLeave(
     });
 
     if (latestOutpass) {
-        // Check for outpass that is already in process
         if (latestOutpass.status === LeaveStatus.PENDING || latestOutpass.status === LeaveStatus.APPROVED)
             throw new Error("Your previous outpass is already in process");
 
-        // Process for the rejected outpass
         if (latestOutpass.status === LeaveStatus.REJECTED) {
             const rejectedLogData = await rejectedLog(latestOutpass.id);
             if (rejectedLogData) {
@@ -55,6 +54,10 @@ export async function requestLeave(
         }
     }
 
+    // 💡 Generate low-literacy safety keys
+    const parentSecretToken = crypto.randomBytes(32).toString("hex"); 
+    const visualMatchCode = Math.floor(1000 + Math.random() * 9000); // Dynamic 4-digit token layout
+
     try {
         const leaveRequest = await prisma.leaveRequest.create({
             data: {
@@ -64,15 +67,20 @@ export async function requestLeave(
                 type,
                 studentId,
                 status: LeaveStatus.PENDING,
-                tier: WorkflowTier.PARENT_REVIEW
+                tier: WorkflowTier.PARENT_REVIEW,
+                parentSecretToken,
+                visualMatchCode
             }
         });
 
-        return leaveRequest;
+        // Return token to frontend so student can prompt the parent link safely
+        return {
+            success: true,
+            id: leaveRequest.id,
+            visualMatchCode: leaveRequest.visualMatchCode,
+            magicUrl: `https://outpass-engine.vercel.app/{parentSecretToken}`
+        };
     } catch (error) {
-        throw new Error("Error Occured while fetching the log");
+        throw new Error("Error occurred while generating outpass payload structure.");
     }
 }
-
-
-export default requestLeave;

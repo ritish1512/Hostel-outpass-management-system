@@ -19,24 +19,48 @@ const nextTier: Record<WorkflowTier, WorkflowTier> = {
 export async function handleReviewAction(
     requestId: string,
     action: "APPROVED" | "REJECTED",
-    remarks?: string
+    remarks?: string,
+    parentBypassToken?: string // 💡 Optional parameter for passwordless validation
 ) {
-    const session = await auth();
-    if (!session) {
-        throw new Error("Session not found");
-    }
-    const actorId = session.user.id;
-    const [outPass, actor] = await Promise.all([
-        prisma.leaveRequest.findUnique({ where: { id: requestId } }),
-        prisma.user.findUnique({ where: { id: actorId } }),
-    ]);
-    if (!outPass) {
-        throw new Error("There is a problem with fetching the outpass");
+    let actorId: string;
+    let actorRole: Role;
+
+    // Check if handling the passwordless token route
+    if (parentBypassToken) {
+        const targetPass = await prisma.leaveRequest.findUnique({
+            where: { id: requestId },
+            include: { student: true }
+        });
+        
+        if (!targetPass || targetPass.parentSecretToken !== parentBypassToken) {
+            throw new Error("Invalid or compromised secure verification transaction link.");
+        }
+        
+        // Find parent account explicitly linked via relation matrix
+        const parentUser = await prisma.user.findUnique({
+            where: { id: targetPass.student.parentId || "" }
+        });
+        
+        if (!parentUser) {
+            throw new Error("No secure parent identity linked to this student node.");
+        }
+        
+        actorId = parentUser.id;
+        actorRole = Role.PARENT;
+    } else {
+        // Fall back to standard next-auth session for Mentor/HOD/Warden/Gatekeeper
+        const session = await auth();
+        if (!session) throw new Error("Session not found");
+        
+        const dbUser = await prisma.user.findUnique({ where: { id: session.user.id } });
+        if (!dbUser || !dbUser.role) throw new Error("Unauthorized identity.");
+        
+        actorId = dbUser.id;
+        actorRole = dbUser.role;
     }
 
-    if (!actor || !actor.role) {
-        throw new Error("Unauthorized action: actor not found or role is missing.");
-    }
+    const outPass = await prisma.leaveRequest.findUnique({ where: { id: requestId } });
+    if (!outPass) throw new Error("There is a problem with fetching the outpass");
 
     const tierRoleMap: Record<WorkflowTier, Role> = {
         PARENT_REVIEW: Role.PARENT,
@@ -51,15 +75,15 @@ export async function handleReviewAction(
     };
 
     const requiredRole = tierRoleMap[outPass.tier];
-    if (requiredRole && actor.role !== requiredRole) {
+    if (requiredRole && actorRole !== requiredRole) {
         throw new Error(`Unauthorized action: only ${requiredRole.toLowerCase()} can process tier ${outPass.tier}.`);
     }
 
     const dbActionStatus = action === "APPROVED" ? LeaveStatus.APPROVED : LeaveStatus.REJECTED;
-    const crntStatus = outPass.status;
-    if (crntStatus === LeaveStatus.COMPLETED || crntStatus === LeaveStatus.REJECTED || crntStatus === LeaveStatus.EXPIRED) {
+    if (outPass.status === LeaveStatus.COMPLETED || outPass.status === LeaveStatus.REJECTED || outPass.status === LeaveStatus.EXPIRED) {
         throw new Error("This outpass can no longer be processed.");
     }
+    
     if (new Date(outPass.endDate).getTime() < Date.now() && outPass.tier !== WorkflowTier.WENT_OUT) {
         throw new Error("This outpass has expired and can no longer be processed.");
     }
@@ -71,22 +95,20 @@ export async function handleReviewAction(
                 data: { status: LeaveStatus.REJECTED, tier: WorkflowTier.ARCHIEVED_REJECTED }
             }),
             prisma.workflowLog.create({
-                data: { leaveRequestId: requestId, actorId, action: dbActionStatus, remarks }
+                data: { leaveRequestId: requestId, actorId, action: dbActionStatus, remarks: remarks || "Declined by Parent via secure verification block." }
             })
         ]);
     }
-    if(crntStatus=== LeaveStatus.PENDING && actor.role===Role.GATEKEEPER){
-        throw new Error("Please get approved first");
-    }
+
     const now = Date.now();
     const endTime = new Date(outPass.endDate).getTime();
     let nextTierValue = nextTier[outPass.tier];
-    if(endTime<now && outPass.tier!==WorkflowTier.WENT_OUT){
+    
+    if (endTime < now && outPass.tier !== WorkflowTier.WENT_OUT) {
         nextTierValue = nextTier[WorkflowTier.ARCHIEVED_REJECTED];
     }
-    if (!nextTierValue) {
-        throw new Error("There is a problem with fetching the next tier");
-    }
+    
+    if (!nextTierValue) throw new Error("Problem fetching the next execution step.");
 
     let newStatus: LeaveStatus = LeaveStatus.PENDING;
     switch (nextTierValue) {
@@ -100,22 +122,23 @@ export async function handleReviewAction(
         default:
             newStatus = LeaveStatus.PENDING;
     }
-    if(endTime<now && outPass.tier!== WorkflowTier.WENT_OUT){
-        newStatus= LeaveStatus.EXPIRED;
+    
+    if (endTime < now && outPass.tier !== WorkflowTier.WENT_OUT) {
+        newStatus = LeaveStatus.EXPIRED;
     }
+
+    // Clean up temporary secret values on successful verification to ensure single-use finality
     const baseData = {
         status: newStatus,
         tier: nextTierValue,
         outTime: outPass.outTime,
-        inTime: outPass.inTime
+        inTime: outPass.inTime,
+        parentSecretToken: null,
+        visualMatchCode: null
     };
 
-    if (nextTierValue === "WENT_OUT") {
-        baseData.outTime = new Date();
-    }
-    if (nextTierValue === "COMPLETED") {
-        baseData.inTime = new Date();
-    }
+    if (nextTierValue === "WENT_OUT") baseData.outTime = new Date();
+    if (nextTierValue === "COMPLETED") baseData.inTime = new Date();
 
     return await prisma.$transaction([
         prisma.leaveRequest.update({

@@ -24,12 +24,13 @@ export interface IOutpass {
   endDate: Date | string;
   reason: string;
   type: LeaveType;
-  student: student;
+  student?: student;
   status: string;
   tier: string;
   createdAt: Date | string;
   outTime?: Date | string | null;
   inTime?: Date | string | null;
+  visualMatchCode: number;
 }
 export default interface dashboardProps {
   outpasses: IOutpass[];
